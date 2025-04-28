@@ -1,0 +1,226 @@
+import streamlit as st
+import pandas as pd
+from db.conexion import session, ConciliacionDivisas, obtener_df
+from datetime import date, datetime
+
+if 'edit' not in st.session_state:
+    st.session_state.edit = True
+
+if 'notificacion' in st.session_state:
+    st.toast(st.session_state.notificacion)
+    del st.session_state.notificacion
+
+if 'selected_movimiento' not in st.session_state:
+    st.session_state.selected_movimiento = None
+
+# Obtener los datos de la tabla CONCILIACION_DIVISAS
+movimientos = obtener_df(ConciliacionDivisas)
+
+@st.dialog("Registro de Movimiento", width="large")
+def agregar_movimiento():
+    st.header('Registrar Nuevo Movimiento')
+    col13, col14 = st.columns(2)
+
+    with col13:
+        fecha = st.date_input('Fecha', value=date.today())
+        cuenta_contable = st.text_input('Cuenta Contable')
+        tipo_operacion = st.text_input('Tipo de Operación')
+        referencia = st.text_input('Referencia')
+        metodo_pago = st.text_input('Método de Pago')
+    with col14:
+        beneficiario = st.text_input('Beneficiario')
+        descripcion = st.text_input('Descripción')
+        ingreso = st.number_input('Ingreso', min_value=0.0, step=0.01, format="%.2f")
+        egreso = st.number_input('Egreso', min_value=0.0, step=0.01, format="%.2f")
+        titular = st.text_input('Titular')
+
+    col10, col11, col12 = st.columns([1, 1, 4], gap='small')
+    with col10:
+        save_changes = st.button(':material/save: Guardar')
+        if save_changes:
+            # Diccionario para almacenar los campos a insertar en ConciliacionDivisas
+            campos_valores_movimiento = {
+                "FECHA": fecha,
+                "CUENTA_CONTABLE": cuenta_contable,
+                "TIPO_OPERACION": tipo_operacion,
+                "REFERENCIA": referencia,
+                "METODO_PAGO": metodo_pago,
+                "BENEFICIARIO": beneficiario,
+                "DESCRIPCION": descripcion,
+                "INGRESO": ingreso,
+                "EGRESO": egreso,
+                "TITULAR": titular
+            }
+
+            # Insertar nuevo movimiento
+            nuevo_movimiento = ConciliacionDivisas(**campos_valores_movimiento)
+            try:
+                session.add(nuevo_movimiento)
+                session.commit()
+                st.session_state.notificacion = 'Movimiento registrado exitosamente'
+                st.rerun()
+            except Exception as e:
+                session.rollback()
+                st.session_state.notificacion = f'Error al insertar el movimiento: {e}'
+                st.rerun()
+
+@st.dialog("Editar Movimiento", width="large")
+def editar_movimiento():
+    movimiento = st.session_state.selected_movimiento
+    if movimiento is None:
+        st.error('No se ha seleccionado ningún movimiento para editar.')
+        return
+
+    col13, col14 = st.columns(2)
+    with col13:
+        fecha = st.date_input('Fecha', value=movimiento['FECHA'], disabled=st.session_state.edit)
+        cuenta_contable = st.text_input('Cuenta Contable', value=movimiento['CUENTA_CONTABLE'], disabled=st.session_state.edit)
+        tipo_operacion = st.text_input('Tipo de Operación', value=movimiento['TIPO_OPERACION'], disabled=st.session_state.edit)
+        referencia = st.text_input('Referencia', value=movimiento['REFERENCIA'], disabled=st.session_state.edit)
+        metodo_pago = st.text_input('Método de Pago', value=movimiento['METODO_PAGO'], disabled=st.session_state.edit)
+    with col14:
+        beneficiario = st.text_input('Beneficiario', value=movimiento['BENEFICIARIO'], disabled=st.session_state.edit)
+        descripcion = st.text_input('Descripción', value=movimiento['DESCRIPCION'], disabled=st.session_state.edit)
+        ingreso = st.number_input('Ingreso', min_value=0.0, step=0.01, value=movimiento['INGRESO'], format="%.2f", disabled=st.session_state.edit)
+        egreso = st.number_input('Egreso', min_value=0.0, step=0.01, value=movimiento['EGRESO'], format="%.2f", disabled=st.session_state.edit)
+        titular = st.text_input('Titular', value=movimiento['TITULAR'], disabled=st.session_state.edit)
+
+    col10, col11, col12 = st.columns([1, 1, 4], gap='small')
+    with col10:
+        def toggle_edit():
+            st.session_state.edit = not st.session_state.edit
+        st.button(':material/edit: Editar', on_click=toggle_edit, use_container_width=True)
+
+    with col11:
+        save_changes = st.button(':material/save: Guardar', use_container_width=True)
+        if save_changes:
+            # Diccionario para almacenar los campos a actualizar en ConciliacionDivisas
+            campos_valores_movimiento = {
+                "FECHA": fecha,
+                "CUENTA_CONTABLE": cuenta_contable,
+                "TIPO_OPERACION": tipo_operacion,
+                "REFERENCIA": referencia,
+                "METODO_PAGO": metodo_pago,
+                "BENEFICIARIO": beneficiario,
+                "DESCRIPCION": descripcion,
+                "INGRESO": ingreso,
+                "EGRESO": egreso,
+                "TITULAR": titular
+            }
+
+            # Actualizar movimiento
+            try:
+                session.query(ConciliacionDivisas).filter(ConciliacionDivisas.ID_MOV_DIVISAS == movimiento['ID_MOV_DIVISAS']).update(campos_valores_movimiento)
+                session.commit()
+                st.session_state.notificacion = 'Movimiento actualizado exitosamente'
+                st.rerun()
+            except Exception as e:
+                session.rollback()
+                st.session_state.notificacion = f'Error al actualizar el movimiento: {e}'
+                st.rerun()
+
+@st.dialog("Eliminar Movimiento", width="large")
+def eliminar_movimiento():
+    st.warning('¿Estás seguro de que quieres eliminar los siguientes movimientos?')
+    for index in st.session_state.selected_movimiento:
+        st.write(f'ID Movimiento: {movimientos.loc[index, "ID_MOV_DIVISAS"]}')
+
+    col0, col1, col2, col3 = st.columns([2, 1.3, 1.3, 2], gap='medium')
+    with col0:
+        if st.button('Confirmar', use_container_width=True):
+            for index in st.session_state.selected_movimiento:
+                try:
+                    session.query(ConciliacionDivisas).filter(ConciliacionDivisas.ID_MOV_DIVISAS == movimientos.loc[index, "ID_MOV_DIVISAS"]).delete()
+                    session.commit()
+                except Exception as e:
+                    session.rollback()
+                    st.session_state.notificacion = f'Error al eliminar el movimiento: {e}'
+                    st.rerun()
+                    return
+            st.session_state.notificacion = 'Movimiento(s) eliminado(s) exitosamente'
+            st.rerun()
+
+# Secciones de la página
+header = st.container()
+tabla = st.container()
+botones = st.container()
+
+with header:
+    st.title('Conciliación Divisas')
+    col1, col0, col2 = st.columns([2, 4, 1], vertical_alignment='center')
+    with col1:
+        # Filtro de fecha: primer día del mes actual hasta hoy
+        filtro = st.date_input(
+            'Filtrar por fecha:',
+            value=(datetime.now().replace(day=1).date(), datetime.now().date()),
+            format='DD/MM/YYYY'
+        )
+    with col2:
+        add_mov = st.button(':material/add: Nuevo', type='primary')
+        if add_mov:
+            agregar_movimiento()
+
+with tabla:
+    if movimientos.empty:
+        st.divider()
+        col4, col5, col6 = st.columns([2.4,1.2,2.4])
+        with col5:
+            st.warning('No hay movimientos registrados')
+            seleccion = []
+    else:
+        # Aplicar el filtro de fecha
+        if isinstance(filtro, tuple) and len(filtro) == 2:
+            fecha_inicio, fecha_fin = filtro
+            movimientos = movimientos[
+                (movimientos['FECHA'] >= fecha_inicio) & (movimientos['FECHA'] <= fecha_fin)
+            ]
+
+        # Configurar las columnas a mostrar
+        movimientos_filtrado = movimientos[[
+            "FECHA", "CUENTA_CONTABLE", "TIPO_OPERACION", "REFERENCIA",
+            "METODO_PAGO", "BENEFICIARIO", "DESCRIPCION", "INGRESO", "EGRESO", "TITULAR"
+        ]]
+        conf_col = {
+            "FECHA": st.column_config.DateColumn("Fecha", format="DD-MM-YYYY"),
+            "CUENTA_CONTABLE": st.column_config.TextColumn("Cuenta Contable"),
+            "TIPO_OPERACION": st.column_config.TextColumn("Tipo de Operación"),
+            "REFERENCIA": st.column_config.TextColumn("Referencia"),
+            "METODO_PAGO": st.column_config.TextColumn("Método de Pago"),
+            "BENEFICIARIO": st.column_config.TextColumn("Beneficiario"),
+            "DESCRIPCION": st.column_config.TextColumn("Descripción"),
+            "INGRESO": st.column_config.NumberColumn("Ingreso", format="$ %.2f"),
+            "EGRESO": st.column_config.NumberColumn("Egreso", format="$ %.2f"),
+            "TITULAR": st.column_config.TextColumn("Titular"),
+        }
+        movimientos_df = st.dataframe(
+            movimientos_filtrado,
+            use_container_width=True,
+            hide_index=True,
+            column_config=conf_col,
+            on_select='rerun',
+            selection_mode="multi-row"
+        )
+        seleccion = movimientos_df.selection.rows
+
+with botones:
+    # Botones de acción
+    col1, col2, col3 = st.columns([1, 1, 4])
+    with col1:
+        if len(seleccion) >= 1:
+            delete_movimiento = st.button(':material/delete: Eliminar Movimiento', type='primary')
+            if delete_movimiento and seleccion:
+                st.session_state.selected_movimiento = seleccion
+                eliminar_movimiento()
+    with col2:
+        if len(seleccion) == 1:
+            edit_movimiento = st.button(':material/edit: Ver/Editar', type='primary')
+            if edit_movimiento and seleccion:
+                # Obtener el índice real del DataFrame basado en la selección
+                if len(seleccion) == 1:
+                    selected_index = movimientos_filtrado.index[seleccion[0]]  # Obtener el índice real del DataFrame
+                    st.session_state.selected_movimiento = movimientos.loc[selected_index].to_dict()
+                editar_movimiento()
+
+#REVISAR PORQUE LOS MONTOS SE ESTAN PASANDO MAL A LA PARTE DE LAS CONCILIACIONES
+#CAMBIAR QUE SI UN INGRESO ES POR EFECTIVO, EL BENEFICIARIO ES CAJA
+#ARREGLAR LOS TRIGGERS FALTANTES, CONFIGURAR LAS PAGINAS DE INGRESOS Y EGRESOS
