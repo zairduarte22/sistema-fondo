@@ -3,21 +3,22 @@ import firebase_admin
 from firebase_admin import credentials, auth
 import pyrebase
 import json
+import streamlit as st
 from dotenv import load_dotenv
 
 load_dotenv(override=True)
 
+# Debug Environment Variables
+
+
 # Initialize Firebase Admin SDK
 if not firebase_admin._apps:
-    firebase_admin_sdk_path = os.getenv("FIREBASE_ADMIN_SDK")
-    if not firebase_admin_sdk_path:
-        raise ValueError("FIREBASE_ADMIN_SDK environment variable is not set or is empty.")
-    if not os.path.exists(firebase_admin_sdk_path):
-        raise FileNotFoundError(f"Firebase Admin SDK JSON file not found at: {firebase_admin_sdk_path}")
-    cred = credentials.Certificate(firebase_admin_sdk_path)
+    firebase_admin_sdk_json = st.secrets["FIREBASE_ADMIN_SDK"]  # Load JSON content from Streamlit Secrets
+    cred = credentials.Certificate(json.loads(firebase_admin_sdk_json))
     firebase_admin.initialize_app(cred)
 
 # Pyrebase configuration
+print("FIREBASE_API_KEY:", os.getenv("FIREBASE_API_KEY"))
 firebase_config = {
     "apiKey": os.getenv("FIREBASE_API_KEY"),
     "authDomain": os.getenv("FIREBASE_AUTH_DOMAIN"),
@@ -32,6 +33,8 @@ firebase = pyrebase.initialize_app(firebase_config)
 pyrebase_auth = firebase.auth()
 
 def login_user(email, password):
+    print("FIREBASE_API_KEY:", os.getenv("FIREBASE_API_KEY"))
+    print("FIREBASE_ADMIN_SDK:", os.getenv("FIREBASE_ADMIN_SDK"))
     try:
         user = pyrebase_auth.sign_in_with_email_and_password(email, password)
         return user
