@@ -1,8 +1,15 @@
-<<<<<<< HEAD
+# Resolve merge conflict by combining both changes
+# Add any additional ignored files here
+
+# Local .gitignore entries
 .env
 auth/firebase-adminsdk.json
-.venv
-=======
+
+# Remote .gitignore entries
+# Default ignored files
+/shelf/
+/workspace.xml
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -133,7 +140,6 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-.env
 .venv
 env/
 venv/
@@ -177,4 +183,3 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
->>>>>>> e8eb50708cbb3b08104873990862819c5536ed6f

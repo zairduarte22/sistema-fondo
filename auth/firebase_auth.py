@@ -3,14 +3,18 @@ import firebase_admin
 from firebase_admin import credentials, auth
 import pyrebase
 import json
+from dotenv import load_dotenv
+
+load_dotenv(override=True)
 
 # Initialize Firebase Admin SDK
 if not firebase_admin._apps:
-    firebase_admin_sdk = os.getenv("FIREBASE_ADMIN_SDK")
-    if not firebase_admin_sdk:
+    firebase_admin_sdk_path = os.getenv("FIREBASE_ADMIN_SDK")
+    if not firebase_admin_sdk_path:
         raise ValueError("FIREBASE_ADMIN_SDK environment variable is not set or is empty.")
-    firebase_admin_sdk_json = json.loads(firebase_admin_sdk)  # Parse the JSON string
-    cred = credentials.Certificate(firebase_admin_sdk_json)
+    if not os.path.exists(firebase_admin_sdk_path):
+        raise FileNotFoundError(f"Firebase Admin SDK JSON file not found at: {firebase_admin_sdk_path}")
+    cred = credentials.Certificate(firebase_admin_sdk_path)
     firebase_admin.initialize_app(cred)
 
 # Pyrebase configuration
