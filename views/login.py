@@ -15,7 +15,8 @@ def login_page():
                 st.subheader("Inicio de Sesión")
                 email = st.text_input("Correo Electrónico", key="login_email")
                 password = st.text_input("Contraseña", type="password")
-                if st.button("Iniciar Sesión"):
+                loginbutton = st.button("Iniciar Sesión", key="login_button")
+                if loginbutton:
                     user = login_user(email, password)
                     if "error" in user:
                         if "INVALID_LOGIN_CREDENTIALS" in user["error"]:
