@@ -140,18 +140,16 @@ def añadir_miembro():
         # Subir archivo CSV
         archivo_csv = st.file_uploader("Subir archivo CSV", type=["csv"])
         if archivo_csv is not None:
-            df = pd.read_csv(archivo_csv)
+            # Leer CSV reemplazando valores vacíos con None
+            df = pd.read_csv(archivo_csv).replace({np.nan: None})
             st.write(df)
             
             if st.button('Cargar Datos'):
-                # Mostrar barra de progreso
                 progress_bar = st.progress(0)
                 status_text = st.empty()
                 
-                # Dividir el DataFrame en lotes
-                batch_size = 50  # Ajustar según necesidad
+                batch_size = 50
                 batches = [df[i:i + batch_size] for i in range(0, len(df), batch_size)]
-                
                 total_batches = len(batches)
                 success_count = 0
                 error_count = 0
@@ -159,24 +157,24 @@ def añadir_miembro():
                 
                 for i, batch in enumerate(batches):
                     try:
-                        # Convertir el lote a diccionarios
                         miembros_data = []
                         info_miembros_data = []
                         saldos_data = []
                         
                         for _, row in batch.iterrows():
-                            # Datos para la tabla Miembro
+                            # Limpiar datos y establecer valores por defecto
                             miembro_data = {
                                 "ID_MIEMBRO": row.get('ID_MIEMBRO'),
                                 "RAZON_SOCIAL": row.get('RAZON_SOCIAL'),
                                 "RIF": row.get('RIF'),
                                 "ULTIMO_MES": row.get('ULTIMO_MES'),
-                                "SALDO": row.get('SALDO'),
-                                "ESTADO": row.get('ESTADO', 'Activo')  # Valor por defecto
+                                "SALDO": float(row.get('SALDO', 0)),  # Convertir a float y valor por defecto 0
+                                "ESTADO": row.get('ESTADO') or 'Activo'  # Valor por defecto 'Activo'
                             }
+                            # Eliminar campos con valor None
+                            miembro_data = {k: v for k, v in miembro_data.items() if v is not None}
                             miembros_data.append(miembro_data)
                             
-                            # Datos para la tabla InformacionMiembro
                             info_data = {
                                 "ID_MIEMBRO": row.get('ID_MIEMBRO'),
                                 "NUM_TELEFONO": row.get('NUM_TELEFONO'),
@@ -186,17 +184,23 @@ def añadir_miembro():
                                 "DIRECCION": row.get('DIRECCION'),
                                 "HACIENDA": row.get('HACIENDA')
                             }
+                            # Eliminar campos con valor None
+                            info_data = {k: v for k, v in info_data.items() if v is not None}
                             info_miembros_data.append(info_data)
                             
-                            # Datos para la tabla Saldo
                             saldo_data = {
                                 "ID_MIEMBRO": row.get('ID_MIEMBRO'),
                                 "DESCRIPCION": "Saldo Inicial",
-                                "MONTO": row.get('SALDO')
+                                "MONTO": float(row.get('SALDO', 0))  # Convertir a float y valor por defecto 0
                             }
                             saldos_data.append(saldo_data)
                         
-                        # Insertar en lotes usando bulk_insert_mappings
+                        # Validar datos obligatorios antes de insertar
+                        for data in miembros_data:
+                            if not all(k in data for k in ["ID_MIEMBRO", "RAZON_SOCIAL", "RIF"]):
+                                raise ValueError(f"Faltan campos obligatorios para el miembro con ID {data.get('ID_MIEMBRO')}")
+                        
+                        # Insertar en lotes
                         session.bulk_insert_mappings(Miembro, miembros_data)
                         session.bulk_insert_mappings(InformacionMiembro, info_miembros_data)
                         session.bulk_insert_mappings(Saldo, saldos_data)
@@ -209,12 +213,9 @@ def añadir_miembro():
                         error_count += len(batch)
                         error_messages.append(f"Error en lote {i+1}: {str(e)}")
                     
-                    # Actualizar barra de progreso
-                    progress = (i + 1) / total_batches
-                    progress_bar.progress(progress)
+                    progress_bar.progress((i + 1) / total_batches)
                     status_text.text(f"Procesando... {i+1}/{total_batches} lotes completados")
                 
-                # Mostrar resultados
                 if error_count == 0:
                     st.success(f"¡Todos los {success_count} miembros fueron cargados exitosamente!")
                 else:
@@ -222,10 +223,8 @@ def añadir_miembro():
                     for msg in error_messages:
                         st.error(msg)
                 
-                # Limpiar UI
                 progress_bar.empty()
                 status_text.empty()
-
 
 def deactivate_edit():
     st.session_state.edit = not st.session_state.edit
