@@ -326,22 +326,22 @@ def editar_factura():
 def eliminar_factura():
     st.warning('¿Estás seguro de que quieres eliminar la siguiente factura?')
     factura = st.session_state.selected_factura
-    st.write(f'ID Factura: {factura["ID_FACTURA"]}')
+    st.write(f'ID Factura: {list(factura["FACT_FONDO"].values())}')
     
     col0, col1, col2, col3 = st.columns([2, 1.3, 1.3, 2], gap='medium')
     with col0:
         if st.button('Confirmar', use_container_width=True):
-            try:
-                session.query(FactCuota).filter(FactCuota.ID_FACTURA == factura["ID_FACTURA"]).delete()
-                session.commit()
-                mensaje = 'Factura eliminada exitosamente'
-                st.session_state.notificacion = mensaje
-                st.rerun()
-            except Exception as e:
-                session.rollback()
-                mensaje = f'Error al eliminar la factura con ID {factura["ID_FACTURA"]}. Error: {e}'
-                st.session_state.notificacion = mensaje
-                st.rerun()
+            for valor in factura["ID_FACTURA"].values():
+                try:
+                    session.query(FactCuota).filter(FactCuota.ID_FACTURA == valor).delete()
+                    session.commit()
+                    mensaje = 'Factura eliminada exitosamente'
+                    st.session_state.notificacion = mensaje
+                except Exception as e:
+                    session.rollback()
+                    mensaje = f'Error al eliminar la factura con ID {factura["ID_FACTURA"]}. Error: {e}'
+                    st.session_state.notificacion = mensaje
+            st.rerun()
 
 @st.dialog("Generar Reporte de Facturación", width="large")
 def generar_reporte():
