@@ -18,10 +18,9 @@ def login_page():
                 loginbutton = st.button("Iniciar Sesión", key="login_button")
                 if loginbutton:
                     user = login_user(email, password)
-                    st.toast("Espere un momento...")
                     if "error" in user:
                         if "INVALID_LOGIN_CREDENTIALS" in user["error"]:
-                            st.error("Credenciales inválidas. Por favor, intente nuevamente.")
+                            st.toast("Credenciales inválidas. Por favor, intente nuevamente.")
                     else:
                         st.toast("Inicio de sesión exitoso!, por favor espere...")
                         st.session_state["user"] = user

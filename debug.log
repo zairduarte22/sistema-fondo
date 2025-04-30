@@ -50,3 +50,5 @@
 [0422/204809.542:ERROR:crashpad_client_win.cc(811)] not connected
 [0423/140519.003:ERROR:crashpad_client_win.cc(811)] not connected
 [0423/140519.125:ERROR:crashpad_client_win.cc(811)] not connected
+[0429/224327.675:ERROR:crashpad_client_win.cc(811)] not connected
+[0429/224327.911:ERROR:crashpad_client_win.cc(811)] not connected
