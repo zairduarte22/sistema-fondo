@@ -34,8 +34,14 @@ def confirmar_eliminacion():
     col0, col2, col3 = st.columns([2,1.3,2], gap='medium')
     with col2:
         if st.button('Confirmar', use_container_width=True):
+            percentage = float(100/(len(id_miembro)))
+            progress = 0
+            delete_bar = st.progress(progress, text=f"Eliminación en progreso {progress}%")
             for id_miembro in st.session_state.ids_a_eliminar:
                 eliminar_miembro(id_miembro)
+                progress = progress+percentage
+                delete_bar.progress(progress, text=f"Eliminación en progreso {progress}%")
+            delete_bar.empty()
             mensaje = 'Miembro(s) eliminado(s).'
             st.session_state.notificacion = mensaje
             st.rerun()
