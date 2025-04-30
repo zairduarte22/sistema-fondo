@@ -46,7 +46,88 @@ def añadir_miembro():
     registro = st.segmented_control('**Tipo de Registro**', ['Individual', 'Multiple'], selection_mode='single', default='Individual')
     
     if registro == 'Individual':
-        # ... (mantener el código existente para registro individual)
+        col6, col7 = st.columns([2.5, 1], vertical_alignment='center')
+        with col6:
+            razon_social = st.text_input('**Razon Social**', placeholder="Nombre del miembro natural o juridico")
+        with col7:
+            saldo = st.number_input('**Saldo Pendiente**', format="%.2f", value=0.00)
+
+        col8, col9 = st.columns([1, 1])
+        with col8:
+            rif = st.text_input('**Documento de Identidad**', placeholder='RIF/Cedula del Miembro')
+            correo = st.text_input('**Correo**', placeholder='Dirección de correo electronico')
+            direccion = st.text_input('**Dirección Fiscal**', placeholder='Dirección fiscal del Miembro')
+            mes = st.text_input('**Ultimo Mes (Si aplica)**', placeholder='Ultimo mes cancelado por el miembro')
+        with col9:
+            representante = st.text_input('**Representante**', placeholder='Representante del Miembro')
+            cedula_r = st.text_input('**Cedula**', placeholder='Cedula de Identidad del Representante')
+            num_phone = st.text_input('**Número de Telefono**', placeholder='Numero en formato internacional')
+            hacienda = st.text_input('**Hacienda**', placeholder='Nombre de la hacienda')
+
+        col10, col11, col12 = st.columns([3, 1, 3], gap='small')
+        with col10:
+            saldo = saldo * -1
+            save_changes = st.button(':material/save: Guardar')
+            if save_changes:
+                # Diccionarios para almacenar los campos a insertar
+                campos_valores_miembro = {
+                    "RAZON_SOCIAL": razon_social,
+                    "RIF": rif,
+                    "ULTIMO_MES": mes,
+                    "SALDO": saldo
+                }
+
+                campos_valores_info_miembro = {
+                    "NUM_TELEFONO": num_phone,
+                    "REPRESENTANTE": representante,
+                    "CI_REPRESENTANTE": cedula_r,
+                    "CORREO": correo,
+                    "DIRECCION": direccion,
+                    "HACIENDA": hacienda
+                }
+
+                campos_valores_saldo = {
+                    "DESCRIPCION": "Saldo Inicial",
+                    "MONTO": saldo
+                }
+                
+                # Insertar nuevo miembro
+                nuevo_miembro = Miembro(**campos_valores_miembro)
+                try:
+                    session.add(nuevo_miembro)
+                    session.commit()
+                    nuevo_id = nuevo_miembro.ID_MIEMBRO
+                except Exception as e:
+                    session.rollback()
+                    st.error(f'Error al insertar el nuevo miembro. Error: {e}')
+                    return
+                
+                # Insertar saldo inicial
+                campos_valores_saldo["ID_MIEMBRO"] = nuevo_id
+                nuevo_saldo = Saldo(**campos_valores_saldo)
+                try:
+                    session.add(nuevo_saldo)
+                    session.commit()
+                except Exception as e:
+                    session.rollback()
+                    mensaje = f'Error al insertar el saldo inicial del nuevo miembro. Error: {e}'
+                    st.session_state.notificacion = mensaje
+                    st.rerun()
+
+                # Insertar información del miembro
+                campos_valores_info_miembro["ID_MIEMBRO"] = nuevo_id
+                nueva_info_miembro = InformacionMiembro(**campos_valores_info_miembro)
+                try:
+                    session.add(nueva_info_miembro)
+                    session.commit()
+                    mensaje = 'Miembro añadido exitosamente.'
+                    st.session_state.notificacion = mensaje
+                    st.rerun()
+                except Exception as e:
+                    session.rollback()
+                    mensaje = f'Error al insertar la información del nuevo miembro. Error: {e}'
+                    st.session_state.notificacion = mensaje
+                    st.rerun()
     else:
         # Botón para descargar el archivo modelo
         st.download_button(
