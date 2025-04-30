@@ -226,6 +226,7 @@ def añadir_miembro():
                 
                 progress_bar.empty()
                 status_text.empty()
+                st.rerun()
 
 def deactivate_edit():
     st.session_state.edit = not st.session_state.edit
