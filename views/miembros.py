@@ -29,8 +29,7 @@ if 'ids_a_eliminar' not in st.session_state:
 @st.dialog('Confirmar Eliminación', width="large")
 def confirmar_eliminacion():
     st.warning('¿Estás seguro de que quieres eliminar los siguientes registros?')
-    for id_miembro in st.session_state.ids_a_eliminar:
-        st.write(f'ID Miembro: {id_miembro}')
+    st.write(f'Miembro(s) a eliminar: {[id_miembro for id_miembro in st.session_state.ids_a_eliminar]}')
     
     col0, col2, col3 = st.columns([2,1.3,2], gap='medium')
     with col2:
