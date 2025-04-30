@@ -4,11 +4,11 @@ import pandas as pd
 import streamlit as st
 
 # 1. Obtener las credenciales de la base de datos desde el archivo secrets.toml
-DB_USER = st.secrets["DB_USER"]
-DB_PASSWORD = st.secrets["DB_PASSWORD"]
-DB_HOST = st.secrets["DB_HOST"]
-DB_PORT = st.secrets["DB_PORT"]
-DB_NAME = st.secrets["DB_NAME"]
+DB_USER = st.secrets["database"]["DB_USER"]
+DB_PASSWORD = st.secrets["database"]["DB_PASSWORD"]
+DB_HOST = st.secrets["database"]["DB_HOST"]
+DB_PORT = st.secrets["database"]["DB_PORT"]
+DB_NAME = st.secrets["database"]["DB_NAME"]
 
 def motor():
     try:
