@@ -2,6 +2,7 @@ from sqlalchemy import create_engine, MetaData, Table, Integer, Column, String, 
 from sqlalchemy.orm import sessionmaker, declarative_base
 import pandas as pd
 import streamlit as st
+import numpy as np
 
 # 1. Obtener las credenciales de la base de datos desde el archivo secrets.toml
 DB_USER = st.secrets["database"]["DB_USER"]
