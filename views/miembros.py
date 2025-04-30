@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from db.conexion import session, Miembro, InformacionMiembro, Saldo, obtener_df_join
+from db.conexion import session, Miembro, InformacionMiembro, Saldo, obtener_df_join, obtener_df
 from sqlalchemy import update, delete, text
 import io
 from utils.cobranzas_whatsapp import enviar_mensaje_api
