@@ -368,6 +368,7 @@ def generar_archivo_modelo():
 
 # Se obtienen valores de las tablas miembros e informacion_miembros mediante un join
 miembros_completo = obtener_df_join(Miembro, InformacionMiembro)
+miembros_base = obtener_df(Miembro)
 
 @st.dialog('Cobranzas', width="large")
 def cobranza(df):
@@ -501,17 +502,16 @@ with datos:
 
 # DATAFRAME CON LOS DATOS DE LOS MIEMBROS
 with tabla:
-    if miembros_completo.empty:
+    if miembros_base.empty:
         st.warning('No hay datos para mostrar')
         seleccion = []
-    elif not miembros_completo.empty:
+    elif not miembros_base.empty:
         # Selección de las columnas a mostrar
-        miembros = miembros_completo[["ID_MIEMBRO", "RAZON_SOCIAL", "REPRESENTANTE", "RIF", "ULTIMO_MES", "SALDO", "ESTADO"]]
+        miembros = miembros_base[["ID_MIEMBRO", "RAZON_SOCIAL", "RIF", "ULTIMO_MES", "SALDO", "ESTADO"]]
         # Configuración de las columnas
         conf_col = {
             "ID_MIEMBRO": st.column_config.NumberColumn("Cod."),
             "RAZON_SOCIAL": st.column_config.TextColumn("Razón Social"),
-            "REPRESENTANTE": st.column_config.TextColumn("Representante"),
             "RIF": st.column_config.TextColumn("Documento"),
             "ULTIMO_MES": st.column_config.TextColumn("Mensualidad"),
             "SALDO": st.column_config.NumberColumn("Saldo", format="$ %.2f"),
