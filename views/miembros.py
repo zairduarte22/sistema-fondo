@@ -343,6 +343,7 @@ def eliminar_miembro(id_miembro):
         # Eliminar información del miembro
         exito_info_miembro = eliminar_datos(InformacionMiembro.__table__, id_miembro)
         # Eliminar miembro
+        exito_saldo_miembro = eliminar_datos(Saldo.__table__, id_miembro)
         exito_miembro = eliminar_datos(Miembro.__table__, id_miembro)
         
         if exito_info_miembro and exito_miembro:
