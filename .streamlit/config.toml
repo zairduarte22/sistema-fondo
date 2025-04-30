@@ -4,5 +4,5 @@ primaryColor = "#036b08"
 
 [server]
 port = 8501
-enableCORS = false
+enableCORS = true
 enableXsrfProtection = true
