@@ -569,7 +569,7 @@ with botones:
             if len(seleccion) >= 1:
                 delete_factura = st.button(':material/delete: Eliminar Factura', type='primary')
                 if delete_factura and seleccion:
-                    st.session_state.selected_factura = facturas_completo.iloc[(seleccion[0])].to_dict()
+                    st.session_state.selected_factura = facturas_completo.iloc[(seleccion)].to_dict()
                     eliminar_factura()
     with col2:
         if len(seleccion) == 1:
