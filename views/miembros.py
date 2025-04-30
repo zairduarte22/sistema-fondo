@@ -42,7 +42,6 @@ def confirmar_eliminacion():
                 eliminar_miembro(id_miembro)
                 progress = progress+percentage
                 delete_bar.progress(progress, text=f"Eliminación en progreso {progress}%")
-            delete_bar.empty()
             mensaje = 'Miembro(s) eliminado(s).'
             st.session_state.notificacion = mensaje
             st.rerun()
