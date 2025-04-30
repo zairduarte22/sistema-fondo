@@ -494,11 +494,11 @@ with header:
 with datos:
     col11, col12, col13 = st.columns(3)
     with col11:
-        st.metric('TOTAL MIEMBROS', len(miembros_completo['RAZON_SOCIAL']))
+        st.metric('TOTAL MIEMBROS', len(miembros_base['RAZON_SOCIAL']))
     with col12:
-        st.metric('MIEMBROS SOLVENTES', len(miembros_completo[miembros_completo['ESTADO'] == 'SOLVENTE']))
+        st.metric('MIEMBROS SOLVENTES', len(miembros_base[miembros_base['ESTADO'] == 'SOLVENTE']))
     with col13:
-        st.metric('MIEMBROS INSOLVENTES', len(miembros_completo[miembros_completo['ESTADO'] == 'INSOLVENTE']))
+        st.metric('MIEMBROS INSOLVENTES', len(miembros_base[miembros_base['ESTADO'] == 'INSOLVENTE']))
 
 # DATAFRAME CON LOS DATOS DE LOS MIEMBROS
 with tabla:
