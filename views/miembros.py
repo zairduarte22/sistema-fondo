@@ -29,15 +29,16 @@ if 'ids_a_eliminar' not in st.session_state:
 @st.dialog('Confirmar Eliminación', width="large")
 def confirmar_eliminacion():
     st.warning('¿Estás seguro de que quieres eliminar los siguientes registros?')
-    st.write(f'Miembro(s) a eliminar: {[int(id_miembro) for id_miembro in st.session_state.ids_a_eliminar]}')
+    ids_miembros = [int(id_miembro) for id_miembro in st.session_state.ids_a_eliminar]
+    st.write(f'Miembro(s) a eliminar: {ids_miembros}')
     
     col0, col2, col3 = st.columns([2,1.3,2], gap='medium')
     with col2:
         if st.button('Confirmar', use_container_width=True):
-            percentage = float(100/(len(id_miembro)))
+            percentage = (100/(len(ids_miembros)))
             progress = 0
             delete_bar = st.progress(progress, text=f"Eliminación en progreso {progress}%")
-            for id_miembro in st.session_state.ids_a_eliminar:
+            for id_miembro in ids_miembros:
                 eliminar_miembro(id_miembro)
                 progress = progress+percentage
                 delete_bar.progress(progress, text=f"Eliminación en progreso {progress}%")
