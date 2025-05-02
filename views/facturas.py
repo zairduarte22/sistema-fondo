@@ -662,20 +662,17 @@ html_content = """
 <head>
     <style>
         @page {
-            size: A5 landscape; /* Forzar orientación horizontal */
+            size: 205mm 148mm;
             margin: 0;
-            padding: 0;
         }
         body {
-            font-family: 'Arial';
-            font-size: 12.5pt;
-            width: 205mm; /* Ancho total del papel */
-            height: 148mm; /* Alto total del papel */
+            width: 205mm;
+            height: 148mm;
             margin: 0;
-            padding: 0 !important; /* Sin padding interno */
+            padding: 10mm 15mm;
+            font-family: Arial;
+            font-size: 12.5pt;
             position: relative;
-            overflow: hidden; /* Evita fugas de contenido */
-            box-sizing: border-box;
         }
         .date {
             position: absolute;
