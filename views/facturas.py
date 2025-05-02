@@ -683,19 +683,19 @@ html_content = """
         }
         .name {
             position: absolute;
-            top: 36mm;
+            top: 44mm;
             left: 66mm;
             font-weight: bold;
             font-size: 13.5pt;
         }
         .address {
             position: absolute;
-            top: 44mm;
+            top: 50mm;
             left: 50mm;
         }
         .id {
             position: absolute;
-            top: 56mm;
+            top: 54mm;
             left: 150mm;
             /* Prueba añadiendo !important para la impresión */
             /* position: absolute !important;
