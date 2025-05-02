@@ -667,14 +667,22 @@ html_content = """
             padding: 0;
         }
         body {
-            width: 210mm;
-            height: 148mm;
+            width: 205mm;
             margin: 0;
-            padding: 0mm;
+            padding: 0;
             font-family: Arial;
             font-size: 12.5pt;
+        }
+        .pagina {
+            width: 205mm;
+            height: 148mm;
             position: relative;
-            overflow-x: visible;
+            padding: 10mm 15mm;
+            page-break-after: always;
+            overflow: hidden;
+        }
+        .pagina:last-child {
+            page-break-after: auto;
         }
         .date {
             position: absolute;
@@ -783,46 +791,50 @@ html_content = """
     </style>
 </head>
 <body>
-    <div class="date">31 &emsp;12 &emsp;2025</div>
-
-    <div class="name">MARIO SAAB</div>
-    <div class="address">URB EL VALLE</div>
-    <div class="id">V-127582390</div>
-
-    <div class="item-container">
-        <div class="item-description">
-            CANCELACIÓN DEL 20% POR CUOTA CORRESPONDIENTE A ENERO 2024 CON UN TEXTO MÁS LARGO QUE GENERA SALTO DE LÍNEA
+     <div class="pagina">
+        <div class="date">31 &emsp;12 &emsp;2025</div>
+    
+        <div class="name">MARIO SAAB</div>
+        <div class="address">URB EL VALLE</div>
+        <div class="id">V-127582390</div>
+    
+        <div class="item-container">
+            <div class="item-description">
+                CANCELACIÓN DEL 20% POR CUOTA CORRESPONDIENTE A ENERO 2024 CON UN TEXTO MÁS LARGO QUE GENERA SALTO DE LÍNEA
+            </div>
+            <div class="item-amount">
+                144.00
+            </div>
         </div>
-        <div class="item-amount">
-            144.00
-        </div>
+    
+        <div class="total1">576.00</div>
+        <div class="dash1">-</div>
+        <div class="dash2">-</div>
+        <div class="final-total">576.00</div>
     </div>
 
-    <div class="total1">576.00</div>
-    <div class="dash1">-</div>
-    <div class="dash2">-</div>
-    <div class="final-total">576.00</div>
-</body>
-<body>
-    <div class="date">31 &emsp;12 &emsp;2025</div>
-
-    <div class="name">MARIO SAAB</div>
-    <div class="address">URB EL VALLE</div>
-    <div class="id">V-127582390</div>
-
-    <div class="item-container">
-        <div class="item-description">
-            CANCELACIÓN DEL 20% POR CUOTA CORRESPONDIENTE A ENERO 2024 CON UN TEXTO MÁS LARGO QUE GENERA SALTO DE LÍNEA
+    <!-- SEGUNDA PÁGINA (MONTOS ACTUALIZADOS) -->
+    <div class="pagina">
+        <div class="date">31 &emsp;12 &emsp;2025</div>
+    
+        <div class="name">MARIO ROMERO</div>
+        <div class="address">URB EL VALLE</div>
+        <div class="id">V-127582390</div>
+    
+        <div class="item-container">
+            <div class="item-description">
+                CANCELACIÓN DEL 20% POR CUOTA CORRESPONDIENTE A ENERO 2024 CON UN TEXTO MÁS LARGO QUE GENERA SALTO DE LÍNEA
+            </div>
+            <div class="item-amount">
+                144.00
+            </div>
         </div>
-        <div class="item-amount">
-            144.00
-        </div>
+    
+        <div class="total1">576.00</div>
+        <div class="dash1">-</div>
+        <div class="dash2">-</div>
+        <div class="final-total">576.00</div>
     </div>
-
-    <div class="total1">576.00</div>
-    <div class="dash1">-</div>
-    <div class="dash2">-</div>
-    <div class="final-total">576.00</div>
 </body>
 </html>
 """
