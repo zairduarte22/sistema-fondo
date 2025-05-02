@@ -765,19 +765,20 @@ html_content = """
         <div class="item-description">
             CANCELACIÓN DEL 60% POR CUOTA CORRESPONDIENTE A ENERO 2024
         </div>
-            <div class="item-amount">
-                432.00
-            </div>
+        <div class="item-amount">
+            432.00
         </div>
+    </div>
         
-        <!-- Ejemplo 2: Descripción con múltiples líneas -->
-        <div class="item-container">
-            <div class="item-description">
-                CANCELACIÓN DEL 20% POR CUOTA CORRESPONDIENTE A ENERO 2024 CON UN TEXTO MÁS LARGO QUE GENERA SALTO DE LÍNEA
-            </div>
-            <div class="item-amount">
-                144.00
-            </div>
+    <!-- Ejemplo 2: Descripción con múltiples líneas -->
+    <div class="item-container">
+        <div class="item-description">
+            CANCELACIÓN DEL 20% POR CUOTA CORRESPONDIENTE A ENERO 2024 CON UN TEXTO MÁS LARGO QUE GENERA SALTO DE LÍNEA
+        </div>
+        <div class="item-amount">
+            144.00
+        </div>
+    </div>
     
     <div class="total1">576.00</div>
     <div class="dash1">-</div>
