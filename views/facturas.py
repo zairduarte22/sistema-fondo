@@ -662,19 +662,19 @@ html_content = """
 <head>
     <style>
         @page {
-            size: 205mm 148mm; /* Tamaño exacto que necesitas */
-            margin: 0;
+            size: 205mm 148mm; /* Tamaño real del papel */
+            margin: 0 !important; /* Elimina márgenes del navegador */
             padding: 0;
         }
         body {
             font-family: 'Arial';
             font-size: 12.5pt;
-            width: 205mm;
-            height: 148mm;
+            width: 205mm; /* Ancho total del papel */
+            height: 148mm; /* Alto total del papel */
             margin: 0;
-            padding: 10mm 15mm; /* Márgenes internos reducidos */
+            padding: 0 !important; /* Sin padding interno */
             position: relative;
-            overflow: hidden; /* Evita que nada se desborde */
+            overflow: hidden; /* Evita fugas de contenido */
             box-sizing: border-box;
         }
         .date {
