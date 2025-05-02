@@ -676,84 +676,120 @@ html_content = """
             position: relative;
             overflow-x: visible;
         }
-        .header-info {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start; /* Para alinear la fecha arriba */
+        .date {
             position: absolute;
             top: 36mm;
-            left: 16mm; /* Ajusta el margen izquierdo */
-            right: 16mm; /* Ajusta el margen derecho */
-        }
-        .date {
-            text-align: right;
-        }
-        .client-details {
-            position: absolute;
-            top: 48mm;
-            left: 16mm; /* Ajusta el margen izquierdo */
+            right: 153mm;
         }
         .name {
+            position: absolute;
+            top: 48mm;
+            left: 62mm;
             font-weight: bold;
             font-size: 13.5pt;
-            margin-bottom: 2mm;
         }
         .address {
-            margin-bottom: 2mm;
+            position: absolute;
+            top: 53mm;
+            left: 47mm;
         }
-        .id-container {
-            text-align: left; /* Alinea el ID a la izquierda si es necesario */
+        .id {
+            position: absolute;
+            top: 60mm;
+            left: 148mm;
+            /* Prueba añadiendo !important para la impresión */
+            /* position: absolute !important;
+            top: 60mm !important;
+            left: 148mm !important; */
         }
+
         .item-container {
             position: absolute;
             top: 70mm;
             left: 16mm;
-            width: 178mm; /* Ajusta el ancho considerando los márgenes */
+            width: 150mm;
             display: flex;
             justify-content: space-between;
-            border-bottom: 1px dashed #ccc; /* Borde inferior para separar ítems */
-            padding-bottom: 3mm;
+            border-bottom: 1px dashed #ccc; /* Solo para visualización */
             margin-bottom: 5mm;
         }
+
         .item-description {
-            width: 130mm; /* Ajusta el ancho */
+            width: 104mm;
             text-align: left;
             word-wrap: break-word;
             overflow-wrap: break-word;
             white-space: normal;
+            /* background-color: rgba(255,0,0,0.1); /* Solo para visualización */
         }
+
         .item-amount {
-            width: 40mm; /* Ajusta el ancho */
+            width: 32mm;
             text-align: right;
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
+            /* background-color: rgba(0,255,0,0.1); /* Solo para visualización */
+            /* Prueba añadiendo !important para la impresión */
+            /* display: flex !important;
+            flex-direction: column !important;
+            justify-content: flex-end !important; */
         }
-        .totals-container {
+
+        .total1 {
             position: absolute;
             top: 115mm;
-            right: 16mm;
-            width: 60mm; /* Ajusta el ancho */
+            right: 20mm;
             text-align: right;
         }
-        .total1, .dash1, .dash2, .final-total {
-            margin-bottom: 2mm;
+        .dash1 {
+            position: absolute;
+            top: 120mm;
+            right: 20mm;
+            text-align: right;
+        }
+        .dash2 {
+            position: absolute;
+            top: 125mm;
+            right: 20mm;
+            text-align: right;
         }
         .final-total {
+            position: absolute;
+            top: 130mm;
+            right: 20mm;
+            text-align: right;
             font-weight: bold;
+        }
+
+        /* Estilos específicos para la impresión (prueba aquí) */
+        @media print {
+            /* Intenta forzar la visualización */
+            .id {
+                /* position: absolute !important;
+                top: 60mm !important;
+                left: 148mm !important; */
+                color: black !important; /* Asegúrate de que el color no sea blanco o transparente */
+            }
+            .item-amount {
+                /* display: flex !important;
+                flex-direction: column !important;
+                justify-content: flex-end !important; */
+                color: black !important; /* Asegúrate de que el color no sea blanco o transparente */
+            }
+
+            /* Prueba con un borde para ver si el elemento está ahí */
+            /* .id { border: 1px solid black !important; }
+            .item-amount { border: 1px solid blue !important; } */
         }
     </style>
 </head>
 <body>
-    <div class="header-info">
-        <div></div> <div class="date">31 &emsp;12 &emsp;2025</div>
-    </div>
+    <div class="date">31 &emsp;12 &emsp;2025</div>
 
-    <div class="client-details">
-        <div class="name">MARIO SAAB</div>
-        <div class="address">URB EL VALLE</div>
-        <div class="id-container">ID: V-127582390</div>
-    </div>
+    <div class="name">MARIO SAAB</div>
+    <div class="address">URB EL VALLE</div>
+    <div class="id">V-127582390</div>
 
     <div class="item-container">
         <div class="item-description">
@@ -764,12 +800,10 @@ html_content = """
         </div>
     </div>
 
-    <div class="totals-container">
-        <div class="total1">576.00</div>
-        <div class="dash1">-</div>
-        <div class="dash2">-</div>
-        <div class="final-total">576.00</div>
-    </div>
+    <div class="total1">576.00</div>
+    <div class="dash1">-</div>
+    <div class="dash2">-</div>
+    <div class="final-total">576.00</div>
 </body>
 </html>
 """
