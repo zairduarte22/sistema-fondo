@@ -669,7 +669,7 @@ html_content = """
             font-family: 'Arial';
             font-size: 12.5pt;
             width: 200mm;
-            height: 148mm;
+            height: 147mm;
             margin: 0;
             padding: 15mm 20mm;
             position: relative;
