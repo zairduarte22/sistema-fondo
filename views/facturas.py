@@ -684,26 +684,31 @@ html_content = """
         }
         .name {
             position: absolute;
-            top: 35mm;
-            left: 20mm;
+            top: 48mm;
+            left: 62mm;
             font-weight: bold;
             font-size: 13.5pt;
         }
         .address {
             position: absolute;
-            top: 45mm;
-            left: 20mm;
+            top: 53mm;
+            left: 47mm;
         }
         .id {
             position: absolute;
-            top: 55mm;
-            left: 20mm;
+            top: 70mm;
+            left: 148mm;
+            
         }
         .item1-desc {
             position: absolute;
             top: 75mm;
             left: 20mm;
             line-height: 1.2;
+            max-width: 120mm;  /* Ajusta según tu layout */
+            overflow-wrap: break-word;
+            white-space: normal;
+            hyphens: auto;
         }
         .item1-amount {
             position: absolute;
@@ -716,6 +721,10 @@ html_content = """
             top: 90mm;
             left: 20mm;
             line-height: 1.2;
+            max-width: 120mm;  /* Ajusta según tu layout */
+            overflow-wrap: break-word;
+            white-space: normal;
+            hyphens: auto;
         }
         .item2-amount {
             position: absolute;
@@ -764,8 +773,7 @@ html_content = """
     <div class="item1-amount">432.00</div>
     
     <div class="item2-desc">
-        CANCELACIÓN DEL 20% POR CUOTA CORRESPONDIENTE<br>
-        A ENERO 2024
+        CANCELACIÓN DEL 20% POR CUOTA CORRESPONDIENTE A ENERO 2024
     </div>
     <div class="item2-amount">144.00</div>
     
