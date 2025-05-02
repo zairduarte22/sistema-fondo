@@ -676,93 +676,85 @@ html_content = """
             position: relative;
             overflow-x: visible;
         }
-        .date {
+        .header-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start; /* Para alinear la fecha arriba */
             position: absolute;
             top: 36mm;
-            right: 153mm;
+            left: 16mm; /* Ajusta el margen izquierdo */
+            right: 16mm; /* Ajusta el margen derecho */
         }
-        .name {
+        .date {
+            text-align: right;
+        }
+        .client-details {
             position: absolute;
             top: 48mm;
-            left: 62mm;
+            left: 16mm; /* Ajusta el margen izquierdo */
+        }
+        .name {
             font-weight: bold;
             font-size: 13.5pt;
+            margin-bottom: 2mm;
         }
         .address {
-            position: absolute;
-            top: 53mm;
-            left: 47mm;
+            margin-bottom: 2mm;
         }
-        .id {
-            position: absolute;
-            top: 60mm;
-            left: 148mm;
-            
+        .id-container {
+            text-align: left; /* Alinea el ID a la izquierda si es necesario */
         }
-        
         .item-container {
             position: absolute;
             top: 70mm;
             left: 16mm;
-            width: 150mm;
+            width: 178mm; /* Ajusta el ancho considerando los márgenes */
             display: flex;
             justify-content: space-between;
-            border: 1px dashed #ccc; /* Solo para visualización */
+            border-bottom: 1px dashed #ccc; /* Borde inferior para separar ítems */
+            padding-bottom: 3mm;
             margin-bottom: 5mm;
         }
-        
         .item-description {
-            width: 104mm;
+            width: 130mm; /* Ajusta el ancho */
             text-align: left;
             word-wrap: break-word;
             overflow-wrap: break-word;
             white-space: normal;
-            background-color: rgba(255,0,0,0.1); /* Solo para visualización */
         }
-        
         .item-amount {
-            width: 32mm;
+            width: 40mm; /* Ajusta el ancho */
             text-align: right;
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
-            background-color: rgba(0,255,0,0.1); /* Solo para visualización */
         }
-    
-        .total1 {
+        .totals-container {
             position: absolute;
             top: 115mm;
-            right: 20mm;
+            right: 16mm;
+            width: 60mm; /* Ajusta el ancho */
             text-align: right;
         }
-        .dash1 {
-            position: absolute;
-            top: 120mm;
-            right: 20mm;
-            text-align: right;
-        }
-        .dash2 {
-            position: absolute;
-            top: 125mm;
-            right: 20mm;
-            text-align: right;
+        .total1, .dash1, .dash2, .final-total {
+            margin-bottom: 2mm;
         }
         .final-total {
-            position: absolute;
-            top: 130mm;
-            right: 20mm;
-            text-align: right;
             font-weight: bold;
         }
     </style>
 </head>
 <body>
-    <div class="date">31 &emsp;12 &emsp;2025</div>
-    
-    <div class="name">MARIO SAAB</div>
-    <div class="address">URB EL VALLE</div>
-    <div class="id">V-127582390</div>
-    
+    <div class="header-info">
+        <div></div> <div class="date">31 &emsp;12 &emsp;2025</div>
+    </div>
+
+    <div class="client-details">
+        <div class="name">MARIO SAAB</div>
+        <div class="address">URB EL VALLE</div>
+        <div class="id-container">ID: V-127582390</div>
+    </div>
+
     <div class="item-container">
         <div class="item-description">
             CANCELACIÓN DEL 20% POR CUOTA CORRESPONDIENTE A ENERO 2024 CON UN TEXTO MÁS LARGO QUE GENERA SALTO DE LÍNEA
@@ -771,11 +763,13 @@ html_content = """
             144.00
         </div>
     </div>
-    
-    <div class="total1">576.00</div>
-    <div class="dash1">-</div>
-    <div class="dash2">-</div>
-    <div class="final-total">576.00</div>
+
+    <div class="totals-container">
+        <div class="total1">576.00</div>
+        <div class="dash1">-</div>
+        <div class="dash2">-</div>
+        <div class="final-total">576.00</div>
+    </div>
 </body>
 </html>
 """
