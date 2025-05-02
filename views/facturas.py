@@ -748,7 +748,7 @@ html_content = """
     </style>
 </head>
 <body>
-    <div class="date">31   12   2025</div>
+    <div class="date">31&ensp12&ensp2025</div>
     
     <div class="name">MARIO ALFREDO SAAB</div>
     <div class="address">URB EL VALLE</div>
