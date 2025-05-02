@@ -702,8 +702,9 @@ html_content = """
         }
         
         .item-container {
-            margin-top: 70mm;
-            margin-left: 0mm;
+            position: absolute;
+            top: 70mm;
+            left: 47mm;
             width: 181mm;
             display: flex;
             justify-content: space-between;
