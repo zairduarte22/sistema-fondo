@@ -777,22 +777,21 @@ html_content = """
         
         .name2 {
             position: absolute;
-            top: 49mm;
+            top: 54mm;
             left: 55mm;
-            font-weight: bold;
             font-size: 13.5pt;
         }
         
         .address2 {
             position: absolute;
-            top: 53mm;
+            top: 58mm;
             left: 38mm;
         }
         
         .id2 {
             position: absolute;
-            top: 60mm;
-            left: 155mm;
+            top: 65mm;
+            left: 156mm;
             /* Prueba añadiendo !important para la impresión */
             /* position: absolute !important;
             top: 60mm !important;
@@ -801,7 +800,7 @@ html_content = """
 
         .item-container2 {
             position: absolute;
-            top: 71mm;
+            top: 75mm;
             left: 27mm;
             width: 168mm;
             display: flex;
@@ -832,28 +831,27 @@ html_content = """
 
         .total12 {
             position: absolute;
-            top: 115mm;
+            top: 120mm;
             right: 18mm;
             text-align: right;
         }
         .dash12 {
             position: absolute;
-            top: 125mm;
+            top: 123mm;
             right: 18mm;
             text-align: right;
         }
         .dash22 {
             position: absolute;
-            top: 132mm;
+            top: 135mm;
             right: 18mm;
             text-align: right;
         }
         .final-total2 {
             position: absolute;
-            top: 131mm;
+            top: 141mm;
             right: 18mm;
             text-align: right;
-            font-weight: bold;
         }
 
 
