@@ -662,88 +662,102 @@ html_content = """
 <head>
     <style>
         @page {
-            size: 205mm 148mm;
+            size: 205mm 148mm; /* Tamaño exacto que necesitas */
             margin: 0;
+            padding: 0;
         }
         body {
             font-family: 'Arial';
             font-size: 12.5pt;
-            width: 200mm;
-            height: 147mm;
+            width: 205mm;
+            height: 148mm;
             margin: 0;
-            padding: 15mm 20mm;
+            padding: 10mm 15mm; /* Márgenes internos reducidos */
             position: relative;
+            overflow: hidden; /* Evita que nada se desborde */
+            box-sizing: border-box;
         }
         .date {
             position: absolute;
-            top: 46mm;
-            right: 180mm;
+            top: 15mm;
+            right: 15mm;
         }
         .name {
             position: absolute;
-            top: 35mm;
-            left: 20mm;
+            top: 15mm;
+            left: 15mm;
             font-weight: bold;
             font-size: 13.5pt;
         }
         .address {
             position: absolute;
-            top: 45mm;
-            left: 20mm;
+            top: 30mm;
+            left: 15mm;
         }
         .id {
             position: absolute;
-            top: 55mm;
-            left: 20mm;
+            top: 40mm;
+            left: 15mm;
         }
         .item1-desc {
             position: absolute;
-            top: 75mm;
-            left: 20mm;
+            top: 60mm;
+            left: 15mm;
             line-height: 1.2;
+            width: 120mm;
         }
         .item1-amount {
             position: absolute;
-            top: 75mm;
-            right: 20mm;
+            top: 60mm;
+            right: 15mm;
             text-align: right;
         }
         .item2-desc {
             position: absolute;
-            top: 90mm;
-            left: 20mm;
+            top: 75mm;
+            left: 15mm;
             line-height: 1.2;
+            width: 120mm;
         }
         .item2-amount {
             position: absolute;
-            top: 90mm;
-            right: 20mm;
+            top: 75mm;
+            right: 15mm;
             text-align: right;
         }
         .total1 {
             position: absolute;
-            top: 115mm;
-            right: 20mm;
+            top: 100mm;
+            right: 15mm;
             text-align: right;
         }
         .dash1 {
             position: absolute;
-            top: 120mm;
-            right: 20mm;
+            top: 105mm;
+            right: 15mm;
             text-align: right;
         }
         .dash2 {
             position: absolute;
-            top: 125mm;
-            right: 20mm;
+            top: 110mm;
+            right: 15mm;
             text-align: right;
         }
         .final-total {
             position: absolute;
-            top: 130mm;
-            right: 20mm;
+            top: 115mm;
+            right: 15mm;
             text-align: right;
             font-weight: bold;
+        }
+        
+        /* Garantiza que no haya saltos de página */
+        @media print {
+            body {
+                height: 148mm;
+                page-break-after: avoid;
+                page-break-inside: avoid;
+            }
         }
     </style>
 </head>
@@ -773,7 +787,6 @@ html_content = """
 </body>
 </html>
 """
-
 
 # Configurar el sistema de impresión
 setup_printing(html_content=html_content)
