@@ -785,7 +785,6 @@ html_content = """
 </body>
 </html>
 """
-"""
 
 
 # Configurar el sistema de impresión
