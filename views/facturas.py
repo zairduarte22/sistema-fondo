@@ -677,6 +677,7 @@ html_content = """
         .pagina {
             width: 205mm;
             height: 148mm;
+            padding: 4mm;
             position: relative;
             page-break-after: always;
             overflow: hidden;
