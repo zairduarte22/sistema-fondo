@@ -771,8 +771,8 @@ html_content = """
         
         .date2 {
             position: absolute;
-            top: 31mm;
-            right: 152mm;
+            top: 46mm;
+            right: 139mm;
         }
         
         .name2 {
@@ -784,14 +784,14 @@ html_content = """
         
         .address2 {
             position: absolute;
-            top: 58mm;
+            top: 59mm;
             left: 38mm;
         }
         
         .id2 {
             position: absolute;
             top: 65mm;
-            left: 156mm;
+            left: 157mm;
             /* Prueba añadiendo !important para la impresión */
             /* position: absolute !important;
             top: 60mm !important;
@@ -800,7 +800,7 @@ html_content = """
 
         .item-container2 {
             position: absolute;
-            top: 72mm;
+            top: 76mm;
             left: 27mm;
             width: 168mm;
             display: flex;
@@ -838,7 +838,7 @@ html_content = """
         }
         .dash12 {
             position: absolute;
-            top: 123mm;
+            top: 128mm;
             right: 18mm;
             text-align: right;
         }
