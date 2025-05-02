@@ -668,12 +668,11 @@ html_content = """
         body {
             font-family: 'Arial';
             font-size: 12.5pt;
-            width: 205mm;
+            width: 200mm;
             height: 148mm;
             margin: 0;
             padding: 15mm 20mm;
             position: relative;
-            background-color: green;
         }
         .date {
             position: absolute;
