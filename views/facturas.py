@@ -670,6 +670,7 @@ html_content = """
             width: 205mm;
             margin: 0;
             padding: 0;
+            padding: 4mm;
             font-family: Arial;
             font-size: 12.5pt;
             position: relative;
@@ -677,7 +678,6 @@ html_content = """
         .pagina {
             width: 205mm;
             height: 148mm;
-            padding: 4mm;
             position: relative;
             page-break-after: always;
             overflow: hidden;
