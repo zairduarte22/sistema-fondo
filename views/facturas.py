@@ -690,7 +690,6 @@ html_content = """
             top: 31mm;
             right: 152mm;
         }
-        }
         .name {
             position: absolute;
             top: 43mm;
