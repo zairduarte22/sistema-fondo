@@ -662,18 +662,19 @@ html_content = """
 <head>
     <style>
         @page {
-            size: 205mm 148mm;
+            size: 210mm 148mm;
             margin: 0;
             padding: 0;
         }
         body {
-            width: 205mm;
+            width: 210mm;
             height: 148mm;
             margin: 0;
             padding: 0mm;
             font-family: Arial;
             font-size: 12.5pt;
             position: relative;
+            overflow-x: visible;
         }
         .date {
             position: absolute;
