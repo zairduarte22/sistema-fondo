@@ -5,11 +5,9 @@ from sqlalchemy import update, delete, text
 import io
 from utils.cobranzas_whatsapp import enviar_mensaje_api
 from utils.bcv_tasa import tasa_bs
-from reportlab.lib.pagesizes import landscape, letter
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
-from reportlab.lib import colors
-from reportlab.lib.styles import getSampleStyleSheet
 import numpy as np
+from utils.informes_pdf import generar_informe_pdf_miembros, model_member_add_csv
+import time
 
 tasa = tasa_bs()
 
@@ -31,21 +29,19 @@ def confirmar_eliminacion():
     st.warning('¿Estás seguro de que quieres eliminar los siguientes registros?')
     ids_miembros = [int(id_miembro) for id_miembro in st.session_state.ids_a_eliminar]
     st.write(f'Miembro(s) a eliminar: {ids_miembros}')
-    
-    col0, col2, col3 = st.columns([2,1.3,2], gap='medium')
-    with col2:
-        if st.button('Confirmar', use_container_width=True):
-            percentage = (100/(len(ids_miembros)))
-            progress = 0
-            delete_bar = st.progress(progress, text=f"Eliminación en progreso {progress}%")
-            for id_miembro in ids_miembros:
-                eliminar_miembro(id_miembro)
-                progress = progress+percentage
-                delete_bar.progress(progress, text=f"Eliminación en progreso {progress}%")
-            mensaje = 'Miembro(s) eliminado(s).'
-            st.session_state.notificacion = mensaje
-            st.rerun()
-            
+    if st.button('Confirmar'):
+        status = st.status('Eliminando miembros...', expanded=True, state='running')
+        for id_miembro in ids_miembros:
+            if eliminar_miembro(id_miembro):
+                with status:
+                    st.write(f"Miembro {id_miembro} eliminado exitosamente.")
+            else:
+                with status:
+                    st.error(f"Error al eliminar el miembro {id_miembro}.")
+                    status.update(label='Hubo un error inesperado :(', state='error', expanded=False)
+        status.update(label='Eliminación completada', state='complete', expanded=False)
+        st.session_state.notificacion = 'Miembro(s) eliminado(s).'
+        st.rerun()
 
 @st.dialog('Añadir Miembro', width="large")
 def añadir_miembro():
@@ -135,102 +131,138 @@ def añadir_miembro():
                     st.session_state.notificacion = mensaje
                     st.rerun()
     else:
-        # Botón para descargar el archivo modelo
-        st.download_button(
-            label="Descargar Archivo Modelo",
-            data=generar_archivo_modelo(),
-            file_name="modelo_miembros.csv",
-            mime="text/csv"
-        )
-        
-        # Subir archivo CSV
         archivo_csv = st.file_uploader("Subir archivo CSV", type=["csv"])
+        st.download_button(
+            label="¿Aún no tienes un archivo CSV? **Descarga el modelo aquí**",
+            data=model_member_add_csv(),
+            file_name="modelo_miembros.csv",
+            mime="text/csv",
+            type='tertiary'
+        )
         if archivo_csv is not None:
-            # Leer CSV reemplazando valores vacíos con None
-            df = pd.read_csv(archivo_csv).replace({np.nan: None})
-            st.write(df)
-            
-            if st.button('Cargar Datos'):
-                progress_bar = st.progress(0)
-                status_text = st.empty()
+            try:
+                # Leer y limpiar datos
+                df = pd.read_csv(archivo_csv, keep_default_na=False, na_values=['', 'NA', 'N/A', 'NaN'])
+                df = df.replace({np.nan: None, 'nan': None, 'NaN': None})
                 
-                batch_size = 50
-                batches = [df[i:i + batch_size] for i in range(0, len(df), batch_size)]
-                total_batches = len(batches)
-                success_count = 0
-                error_count = 0
-                error_messages = []
-                
-                for i, batch in enumerate(batches):
-                    try:
-                        miembros_data = []
-                        info_miembros_data = []
-                        saldos_data = []
-                        
-                        for _, row in batch.iterrows():
-                            # Limpiar datos y establecer valores por defecto
-                            miembro_data = {
-                                "ID_MIEMBRO": row.get('ID_MIEMBRO'),
-                                "RAZON_SOCIAL": row.get('RAZON_SOCIAL'),
-                                "RIF": row.get('RIF'),
-                                "ULTIMO_MES": row.get('ULTIMO_MES'),
-                                "SALDO": float(row.get('SALDO', 0)),  # Convertir a float y valor por defecto 0
-                                "ESTADO": row.get('ESTADO') or 'Activo'  # Valor por defecto 'Activo'
-                            }
-                            # Eliminar campos con valor None
-                            miembro_data = {k: v for k, v in miembro_data.items() if v is not None}
-                            miembros_data.append(miembro_data)
-                            
-                            info_data = {
-                                "ID_MIEMBRO": row.get('ID_MIEMBRO'),
-                                "NUM_TELEFONO": row.get('NUM_TELEFONO'),
-                                "REPRESENTANTE": row.get('REPRESENTANTE'),
-                                "CI_REPRESENTANTE": row.get('CI_REPRESENTANTE'),
-                                "CORREO": row.get('CORREO'),
-                                "DIRECCION": row.get('DIRECCION'),
-                                "HACIENDA": row.get('HACIENDA')
-                            }
-                            # Eliminar campos con valor None
-                            info_data = {k: v for k, v in info_data.items() if v is not None}
-                            info_miembros_data.append(info_data)
-                            
-                            saldo_data = {
-                                "ID_MIEMBRO": row.get('ID_MIEMBRO'),
-                                "DESCRIPCION": "Saldo Inicial",
-                                "MONTO": float(row.get('SALDO', 0))  # Convertir a float y valor por defecto 0
-                            }
-                            saldos_data.append(saldo_data)
-                        
-                        # Validar datos obligatorios antes de insertar
-                        for data in miembros_data:
-                            if not all(k in data for k in ["ID_MIEMBRO", "RAZON_SOCIAL", "RIF"]):
-                                raise ValueError(f"Faltan campos obligatorios para el miembro con ID {data.get('ID_MIEMBRO')}")
-                        
-                        # Insertar en lotes
-                        session.bulk_insert_mappings(Miembro, miembros_data)
-                        session.bulk_insert_mappings(InformacionMiembro, info_miembros_data)
-                        session.bulk_insert_mappings(Saldo, saldos_data)
-                        
-                        session.commit()
-                        success_count += len(batch)
-                        
-                    except Exception as e:
-                        session.rollback()
-                        error_count += len(batch)
-                        error_messages.append(f"Error en lote {i+1}: {str(e)}")
+                st.write("Vista previa de los datos:")
+                st.dataframe(df.head())
+
+                if st.button('Cargar Datos', key='cargar_csv'):
+                    # Obtener IDs existentes
+                    ids_existentes = {id_[0] for id_ in session.query(Miembro.ID_MIEMBRO).all()}
                     
-                    progress_bar.progress((i + 1) / total_batches)
-                    status_text.text(f"Procesando... {i+1}/{total_batches} lotes completados")
-                
-                if error_count == 0:
-                    st.success(f"¡Todos los {success_count} miembros fueron cargados exitosamente!")
-                else:
-                    st.warning(f"Se cargaron {success_count} miembros con éxito, pero hubo {error_count} errores.")
-                    for msg in error_messages:
-                        st.error(msg)
-                
-                progress_bar.empty()
-                status_text.empty()
+                    # Separar DataFrame
+                    nuevos = df[~df['ID_MIEMBRO'].isin(ids_existentes)]
+                    existentes = df[df['ID_MIEMBRO'].isin(ids_existentes)]
+                    
+                    st.info(f"Registros nuevos: {len(nuevos)} | Registros existentes: {len(existentes)}")
+                    
+                    # Procesar en lotes
+                    batch_size = 50
+                    progress_bar = st.progress(0)
+                    status_text = st.empty()
+                    total_ops = len(nuevos) + len(existentes)
+                    
+                    # 1. Procesar NUEVOS registros (INSERCIÓN)
+                    if len(nuevos) > 0:
+                        status_text.text("Procesando nuevos miembros...")
+                        
+                        for i in range(0, len(nuevos), batch_size):
+                            batch = nuevos[i:i + batch_size]
+                            miembros_batch = []
+                            info_batch = []
+                            saldos_batch = []
+                            
+                            for _, row in batch.iterrows():
+                                # Validar campos obligatorios
+                                if None in [row.get('ID_MIEMBRO'), row.get('RAZON_SOCIAL'), row.get('RIF')]:
+                                    raise ValueError(f"Campos obligatorios faltantes en fila {i}")
+
+                                # Procesamiento CORRECTO de ULTIMO_MES
+                                ultimo_mes = None
+                                if pd.notna(row.get('ULTIMO_MES')) and str(row.get('ULTIMO_MES')).strip() != '':
+                                    ultimo_mes = str(row.get('ULTIMO_MES')).strip()
+                                    # Opcional: Formatear consistente (ej. mayúsculas)
+                                    ultimo_mes = ultimo_mes.upper() if ultimo_mes else None
+
+                                # Datos para Miembro - Asegurando incluir ULTIMO_MES
+                                miembro_data = {
+                                    'ID_MIEMBRO': int(row.get('ID_MIEMBRO')),
+                                    'RAZON_SOCIAL': row.get('RAZON_SOCIAL'),
+                                    'RIF': row.get('RIF'),
+                                    'ULTIMO_MES': ultimo_mes,  # Ahora sí se incluye correctamente
+                                    'SALDO': float(row.get('SALDO', 0))
+                                }
+                                miembros_batch.append(miembro_data)
+                                
+                                # Resto de preparación de datos para info_batch y saldos_batch
+                                # ... (igual que antes)
+                            
+                            # Insertar lote - VERIFICACIÓN ADICIONAL
+                            try:
+                                # Debug: Verificar datos antes de insertar
+                                print(f"Lote {i}: ULTIMO_MES a insertar:", [m['ULTIMO_MES'] for m in miembros_batch])
+                                
+                                session.bulk_insert_mappings(Miembro, miembros_batch)
+                                session.bulk_insert_mappings(InformacionMiembro, info_batch)
+                                session.bulk_insert_mappings(Saldo, saldos_batch)
+                                session.commit()
+                            except Exception as e:
+                                session.rollback()
+                                st.error(f"Error en lote {i//batch_size + 1}: {str(e)}")
+                                # Debug adicional
+                                st.error(f"Datos problemáticos: {miembros_batch}")
+                                return
+                            
+                            progress = (i + len(batch)) / total_ops
+                            progress_bar.progress(progress)
+                    
+                    # 2. Procesar EXISTENTES registros (ACTUALIZACIÓN)
+                    if len(existentes) > 0:
+                        status_text.text("Actualizando miembros existentes...")
+                        
+                        for i in range(0, len(existentes), batch_size):
+                            batch = existentes[i:i + batch_size]
+                            
+                            for _, row in batch.iterrows():
+                                # Actualizar miembro existente
+                                miembro = session.query(Miembro).get(int(row['ID_MIEMBRO']))
+                                if miembro:
+                                    if row['RAZON_SOCIAL']: miembro.RAZON_SOCIAL = row['RAZON_SOCIAL']
+                                    if row['RIF']: miembro.RIF = row['RIF']
+                                    if row['ULTIMO_MES']: miembro.ULTIMO_MES = row['ULTIMO_MES']
+                                    if row['SALDO'] is not None: miembro.SALDO = float(row['SALDO'])
+                                
+                                # Actualizar información adicional
+                                info = session.query(InformacionMiembro).filter_by(ID_MIEMBRO=int(row['ID_MIEMBRO'])).first()
+                                if info:
+                                    if row['NUM_TELEFONO']: info.NUM_TELEFONO = row['NUM_TELEFONO']
+                                    if row['REPRESENTANTE']: info.REPRESENTANTE = row['REPRESENTANTE']
+                                    if row['CI_REPRESENTANTE']: info.CI_REPRESENTANTE = row['CI_REPRESENTANTE']
+                                    if row['CORREO']: info.CORREO = row['CORREO']
+                                    if row['DIRECCION']: info.DIRECCION = row['DIRECCION']
+                                    if row['HACIENDA']: info.HACIENDA = row['HACIENDA']
+                            
+                            try:
+                                session.commit()
+                            except Exception as e:
+                                session.rollback()
+                                raise Exception(f"Error actualizando lote {i//batch_size + 1}: {str(e)}")
+                            
+                            progress = (len(nuevos) + i + len(batch)) / total_ops
+                            progress_bar.progress(progress)
+                    
+                    st.success("¡Proceso completado con éxito!")
+                    progress_bar.empty()
+                    status_text.empty()
+                    time.sleep(5)
+                    st.rerun()
+                    
+            except Exception as e:
+                session.rollback()
+                st.error(f"Error durante el procesamiento: {str(e)}")
+                time.sleep(5)
                 st.rerun()
 
 def deactivate_edit():
@@ -259,7 +291,7 @@ def eliminar_datos(tabla, id_miembro):
         return True
     except Exception as e:
         session.rollback()
-        print(f'Se ha producido un error al tratar de eliminar el registro. Error: {e}')
+        st.error(f'Se ha producido un error al tratar de eliminar el registro. Error: {e}')
         return False
     finally:
         session.close()
@@ -269,7 +301,7 @@ def informacion_miembro(num_indice: int, dataframe: pd.DataFrame):
     info = dataframe.loc[num_indice]
     info = info.iloc
 
-    if st.toggle('**HABILITAR EDICION**', False):
+    if st.toggle('**Habilitar Edición**', False):
         st.session_state.edit = False
     else:
         st.session_state.edit = True
@@ -333,48 +365,28 @@ def informacion_miembro(num_indice: int, dataframe: pd.DataFrame):
 
 def eliminar_miembro(id_miembro):
     try:
-        # Eliminar información del miembro
-        exito_info_miembro = eliminar_datos(InformacionMiembro.__table__, id_miembro)
-        # Eliminar miembro
-        exito_saldo_miembro = eliminar_datos(Saldo.__table__, id_miembro)
-        exito_miembro = eliminar_datos(Miembro.__table__, id_miembro)
+        # Iniciar una transacción única para todas las operaciones
+        with session.begin():
+            # 1. Eliminar registros relacionados primero (por restricciones de clave foránea)
+            session.query(Saldo).filter(Saldo.ID_MIEMBRO == id_miembro).delete()
+            session.query(InformacionMiembro).filter(InformacionMiembro.ID_MIEMBRO == id_miembro).delete()
+            
+            # 2. Finalmente eliminar el miembro principal
+            deleted_count = session.query(Miembro).filter(Miembro.ID_MIEMBRO == id_miembro).delete()
+            
+            # Verificar si realmente se eliminó algún registro
+            if deleted_count == 0:
+                st.toast(f'No se encontró el miembro con ID {id_miembro} para eliminar')
+                return False
+            
+        st.toast(f'Miembro con ID {id_miembro} eliminado exitosamente.')
+        return True
         
-        if exito_info_miembro and exito_miembro:
-            st.toast(f'Miembro con ID {id_miembro} eliminado exitosamente.')
     except Exception as e:
+        session.rollback()
         st.toast(f'Error al eliminar el miembro con ID {id_miembro}. Error: {e}')
-
-def style_dataframe(df):
-    return df.style.set_properties(
-        **{
-            "border": "none",  # Quitar bordes
-            "background-color": "transparent",  # Fondo transparente
-        }
-    )
-
-
-def generar_archivo_modelo():
-    output = io.StringIO()
-    df_modelo = pd.DataFrame({
-        "ID_MIEMBRO": pd.Series(dtype='int'),
-        "RAZON_SOCIAL": pd.Series(dtype='str'),
-        "RIF": pd.Series(dtype='str'),
-        "ULTIMO_MES": pd.Series(dtype='str'),
-        "SALDO": pd.Series(dtype='float'),
-        "ESTADO": pd.Series(dtype='str'),
-        "NUM_TELEFONO": pd.Series(dtype='str'),
-        "REPRESENTANTE": pd.Series(dtype='str'),
-        "CI_REPRESENTANTE": pd.Series(dtype='str'),
-        "CORREO": pd.Series(dtype='str'),
-        "DIRECCION": pd.Series(dtype='str'),
-        "HACIENDA": pd.Series(dtype='str')
-    })
-    df_modelo.to_csv(output, index=False)
-    return output.getvalue()
-
-# Se obtienen valores de las tablas miembros e informacion_miembros mediante un join
-miembros_completo = obtener_df_join(Miembro, InformacionMiembro)
-miembros_base = obtener_df(Miembro)
+        return False
+    # No necesitamos finally con session.close() si usas @st.cache_resource para la sesión
 
 @st.dialog('Cobranzas', width="large")
 def cobranza(df):
@@ -423,58 +435,10 @@ def cobranza(df):
             st.session_state.notificacion = mensaje
             st.rerun()
 
-def generar_informe_pdf(miembros_completo):
-    # Crear un buffer para el PDF
-    buffer = io.BytesIO()
-    # Configurar la página en orientación horizontal (landscape) con márgenes pequeños
-    doc = SimpleDocTemplate(
-        buffer,
-        pagesize=landscape(letter),  # Página horizontal
-        rightMargin=20, leftMargin=20, topMargin=20, bottomMargin=20  # Márgenes pequeños
-    )
+# Se obtienen valores de las tablas miembros e informacion_miembros mediante un join
+miembros_completo = obtener_df_join(Miembro, InformacionMiembro)
+miembros_base = obtener_df(Miembro)
 
-    # Estilos
-    styles = getSampleStyleSheet()
-    title_style = styles["Title"]
-    subtitle_style = styles["Heading2"]
-    normal_style = styles["BodyText"]
-
-    # Contenido del PDF
-    elements = []
-
-    # Título
-    elements.append(Paragraph("Informe de Miembros", title_style))
-    elements.append(Spacer(1, 12))
-
-    # Tabla de datos
-    data = [["ID", "Razón Social", "Representante", "RIF", "Mensualidad", "Saldo", "Estado"]] + [
-        [
-            row["ID_MIEMBRO"],
-            row["RAZON_SOCIAL"],
-            row["REPRESENTANTE"],
-            row["RIF"],
-            row["ULTIMO_MES"],
-            f"$ {row['SALDO']:.2f}",
-            row["ESTADO"]
-        ]
-        for _, row in miembros_completo.iterrows()
-    ]
-
-    table = Table(data, colWidths=[50, 150, 150, 100, 100, 100, 100])  # Ajustar el ancho de las columnas
-    table.setStyle(TableStyle([
-        ("BACKGROUND", (0, 0), (-1, 0), colors.darkgreen),  # Fondo verde oscuro para encabezados
-        ("TEXTCOLOR", (0, 0), (-1, 0), colors.whitesmoke),  # Texto blanco en encabezados
-        ("ALIGN", (0, 0), (-1, -1), "CENTER"),  # Centrar texto
-        ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),  # Fuente en negrita para encabezados
-        ("BOTTOMPADDING", (0, 0), (-1, 0), 12),  # Espaciado inferior en encabezados
-        ("GRID", (0, 0), (-1, -1), 1, colors.black),  # Bordes negros
-    ]))
-    elements.append(table)
-
-    # Construir el PDF
-    doc.build(elements)
-    buffer.seek(0)
-    return buffer
 
 # SECCIONES DE LA PAGINA
 header = st.container()
@@ -484,7 +448,7 @@ botones = st.container()
 
 # HEADER DE LA PAGINA
 with header:
-    col0, col1, col3 = st.columns([6, 1, 1], vertical_alignment='center')
+    col0, col1, col3, col5 = st.columns([6, 1, 1, 1], vertical_alignment='center')
     with col0:
         st.title('Miembros')
         st.caption('Esta pagina contiene información reelevante con respecto a los miembros de la organización.')
@@ -493,9 +457,17 @@ with header:
         if add:
             añadir_miembro()
     with col3:
-        cobrar = st.button(':material/phone: Cobrar', use_container_width=True, type='primary')
+        cobrar = st.button(':material/phone: Cobrar', use_container_width=True, type='secondary')
         if cobrar:
             cobranza(miembros_completo)
+    with col5:
+        pdf_buffer = generar_informe_pdf_miembros(miembros_completo)
+        st.download_button(
+            label=":material/download: Informe",
+            data=pdf_buffer,
+            file_name="informe_miembros.pdf",
+            mime="application/pdf"
+        )
 
 with datos:
     col11, col12, col13 = st.columns(3)
@@ -509,7 +481,9 @@ with datos:
 # DATAFRAME CON LOS DATOS DE LOS MIEMBROS
 with tabla:
     if miembros_base.empty:
-        st.warning('No hay datos para mostrar')
+        col01, col02, col03 = st.columns([3, 2, 3])
+        with col02:
+            st.warning('No hay datos para mostrar')
         seleccion = []
     elif not miembros_base.empty:
         # Selección de las columnas a mostrar
@@ -554,13 +528,3 @@ with botones:
             more = st.button(':material/post_add: Ver/Editar', use_container_width=True, type='secondary')
             if more:
                 informacion_miembro(seleccion[0], miembros_completo)
-    col5, col6 = st.columns([1.5, 8])
-    with col5:
-        if st.button(':material/download: Informe', use_container_width=True, type='primary'):
-            pdf_buffer = generar_informe_pdf(miembros_completo)
-            st.download_button(
-                label="PDF",
-                data=pdf_buffer,
-                file_name="informe_miembros.pdf",
-                mime="application/pdf"
-            )

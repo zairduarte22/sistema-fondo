@@ -10,6 +10,9 @@ from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, Image
 from reportlab.lib.units import inch
+from streamlit.components.v1 import html
+import uuid
+
 
 
 if 'edit' not in st.session_state:
@@ -170,19 +173,18 @@ def generar_factura_pdf(factura):
     return pdf_output
 
 
-@st.dialog("Facturación", width="large")
+@st.dialog("Agregar Nueva Factura", width="large")
 def agregar_factura():
-    st.header('Registrar Nueva Factura')
-    col13, col14 = st.columns([7,1])
+    col13, col14 = st.columns([5,3])
 
     with col13:
-        if st.toggle('INSERTAR NUMERO DE FACTURA', value=False):
+        if st.toggle('Modificar Numeración de Facturas', value=False):
             st.session_state.active_number = False
         else:
             st.session_state.active_number = True      
 
     with col14:
-        st.text(f'Tasa: Bs. {tasa_bs()}')   
+        st.write(f'Tasa: Bs. {tasa_bs()}')   
 
     col6, col7 = st.columns([2.5, 1], vertical_alignment='center')
     with col6:
@@ -195,9 +197,9 @@ def agregar_factura():
         print(saldo)
         y = lambda x: x*-1 if x < 0.00 else 0.00
         print(y(saldo))
-        monto_divisas = st.number_input('Monto en Divisas', value=y(saldo))
+        monto_divisas = st.number_input('Monto ($)', value=y(saldo))
         x = lambda x: 0.00 if x == 0.00 else x*tasa_bs()
-        monto_bs = st.number_input('Monto en Bolívares', format="%.2f", value=x(monto_divisas))
+        monto_bs = st.number_input('Monto (Bs.)', format="%.2f", value=x(monto_divisas))
 
     col8, col9 = st.columns([1, 1])
     with col8:
@@ -207,7 +209,12 @@ def agregar_factura():
     with col9:
         fact_ugavi = st.number_input('Factura UGAVI', format="%d", disabled=st.session_state.active_number, value=0)
         fact_fondo = st.number_input('Factura Fondo', format="%d", disabled=st.session_state.active_number, value=0)
-        text = st.text(f'Ultimo Mes: {miembros[miembros['RAZON_SOCIAL'].isin([razon_social])]['ULTIMO_MES'].values}')
+        ultimo_mes = miembros[miembros['RAZON_SOCIAL'].isin([razon_social])]['ULTIMO_MES'].values
+        if len(ultimo_mes) > 0:
+            ultimo_mes = ultimo_mes[0]
+        else:
+            ultimo_mes = 'N/A'
+        text = st.text(f'Ultimo Mes: {ultimo_mes}')
 
     col10, col11, col12 = st.columns([1, 1, 4], gap='small')
     with col10:
@@ -592,3 +599,69 @@ with botones:
                     file_name=f"Factura_{factura_seleccionada['FACT_FONDO']}.pdf",
                     mime="application/pdf"
                 )
+                
+            
+
+def setup_printing(html_content):
+    iframe_id = f"print-frame-{uuid.uuid4()}"
+    
+    js = f"""
+    <script>
+    function preparePrint() {{
+        // Crear iframe oculto
+        var iframe = document.createElement('iframe');
+        iframe.id = '{iframe_id}';
+        iframe.style.position = 'fixed';
+        iframe.style.right = '0';
+        iframe.style.bottom = '0';
+        iframe.style.width = '0';
+        iframe.style.height = '0';
+        iframe.style.border = 'none';
+        document.body.appendChild(iframe);
+        
+        // Insertar contenido
+        var iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+        iframeDoc.open();
+        iframeDoc.write(`{html_content}`);
+        iframeDoc.close();
+        
+        // Guardar referencia
+        window.printIframe = iframe;
+        
+        // Mostrar botón real de impresión
+        document.getElementById('print-btn-hidden').style.display = 'block';
+    }}
+    
+    function executePrint() {{
+        if (window.printIframe) {{
+            window.printIframe.contentWindow.focus();
+            window.printIframe.contentWindow.print();
+        }}
+    }}
+    
+    // Preparar al cargar la página
+    window.addEventListener('load', preparePrint);
+    </script>
+    
+    <button id="print-btn-hidden" 
+            onclick="executePrint()" 
+            style="display: none; position: fixed; right: 20px; bottom: 20px; z-index: 1000;"
+            class="stButton">
+        🖨️ Abrir Diálogo de Impresión
+    </button>
+    """
+    html(js)
+
+fecha_actual = datetime.now().strftime("%d/%m/%Y")
+usuario = "John Doe"
+total = 1250.75
+
+html_content = """
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><meta http-equiv="Content-Style-Type" content="text/css" /><meta name="generator" content="Aspose.Words for .NET 25.4.0" /><title></title><style type="text/css">body { font-family:'Times New Roman'; font-size:12pt }p { margin:0pt }</style></head><body><div><p style="margin-top:65.3pt; margin-left:16.8pt; text-align:justify; line-height:15.85pt"><span style="font-family:Calibri; font-size:13pt">31</span><span style="font-family:Calibri; font-size:13pt; letter-spacing:24.25pt"> </span><span style="font-family:Calibri; font-size:13pt">12</span><span style="font-family:Calibri; font-size:13pt; letter-spacing:23.6pt"> </span><span style="font-family:Calibri; font-size:13pt">2023</span></p><p style="margin-top:3.4pt; margin-right:283.55pt; margin-left:162.15pt; line-height:19.5pt"><span style="font-family:Calibri; font-size:13pt">MARIO</span><span style="font-family:Calibri; font-size:13pt; letter-spacing:5.9pt"> </span><span style="font-family:Calibri; font-size:13pt">ALFREDO</span><span style="font-family:Calibri; font-size:13pt; letter-spacing:9.3pt"> </span><span style="font-family:Calibri; font-size:13pt">SAAB URB</span><span style="font-family:Calibri; font-size:13pt; letter-spacing:4.85pt"> </span><span style="font-family:Calibri; font-size:13pt">EL</span><span style="font-family:Calibri; font-size:13pt; letter-spacing:1.4pt"> </span><span style="font-family:Calibri; font-size:13pt">VALLE</span></p><p style="margin-top:3.65pt; margin-left:520.85pt; text-align:justify; line-height:15.85pt"><span style="font-family:Calibri; font-size:13pt">V-127582390</span></p><p style="margin-top:27.6pt; text-align:justify; line-height:17.05pt"><span style="font-family:Calibri; font-size:14pt">CANCELACIÓN</span><span style="font-family:Calibri; font-size:14pt; letter-spacing:8.2pt"> </span><span style="font-family:Calibri; font-size:14pt">DEL</span><span style="font-family:Calibri; font-size:14pt; letter-spacing:1.75pt"> </span><span style="font-family:Calibri; font-size:14pt">60%</span><span style="font-family:Calibri; font-size:14pt; letter-spacing:2.25pt"> </span><span style="font-family:Calibri; font-size:14pt">POR</span><span style="font-family:Calibri; font-size:14pt; letter-spacing:2.35pt"> </span><span style="font-family:Calibri; font-size:14pt">CUOTA</span><span style="font-family:Calibri; font-size:14pt; letter-spacing:3.95pt"> </span><span style="font-family:Calibri; font-size:14pt">CORRESPONDIENTE</span></p><p style="margin-top:4.75pt; margin-right:1.45pt; line-height:18.15pt"><span style="font-family:Calibri; font-size:14pt">A</span><span style="font-family:Calibri; font-size:14pt; letter-spacing:2.2pt"> </span><span style="font-family:Calibri; font-size:14pt">ENERO</span><span style="font-family:Calibri; font-size:14pt; letter-spacing:3pt"> </span><span style="font-family:Calibri; font-size:14pt">2024</span><span style="font-family:Calibri; font-size:14pt; letter-spacing:450.25pt"> </span><span style="font-family:Calibri; font-size:14pt">432.00 CANCELACIÓN</span><span style="font-family:Calibri; font-size:14pt; letter-spacing:8.2pt"> </span><span style="font-family:Calibri; font-size:14pt">DEL</span><span style="font-family:Calibri; font-size:14pt; letter-spacing:1.75pt"> </span><span style="font-family:Calibri; font-size:14pt">20%</span><span style="font-family:Calibri; font-size:14pt; letter-spacing:2.25pt"> </span><span style="font-family:Calibri; font-size:14pt">POR</span><span style="font-family:Calibri; font-size:14pt; letter-spacing:2.35pt"> </span><span style="font-family:Calibri; font-size:14pt">CUOTA</span><span style="font-family:Calibri; font-size:14pt; letter-spacing:3.95pt"> </span><span style="font-family:Calibri; font-size:14pt">CORRESPONDIENTE</span></p><p style="margin-top:5.8pt; text-align:justify; line-height:17.05pt"><span style="font-family:Calibri; font-size:14pt">A</span><span style="font-family:Calibri; font-size:14pt; letter-spacing:2.2pt"> </span><span style="font-family:Calibri; font-size:14pt">ENERO</span><span style="font-family:Calibri; font-size:14pt; letter-spacing:3pt"> </span><span style="font-family:Calibri; font-size:14pt">2024</span><span style="font-family:Calibri; font-size:14pt; letter-spacing:450.95pt"> </span><span style="font-family:Calibri; font-size:14pt">144.00</span></p><p style="margin-top:118.9pt; margin-left:541pt; text-align:justify; line-height:17.05pt"><span style="font-family:Calibri; font-size:14pt">576.00</span></p></div></body></html>
+"""
+
+
+# Configurar el sistema de impresión
+setup_printing(html_content=html_content)
+
+st.write("Use el botón flotante en la esquina inferior derecha para imprimir")

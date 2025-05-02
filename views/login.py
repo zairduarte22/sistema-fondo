@@ -5,12 +5,11 @@ def login_page():
     col1, col2, col3 = st.columns([1, 7, 1], gap="small")
     with col2:
         with st.container(border=False):
-            st.title("Inicio de Sesión")
+            st.title("¡Bienvenido!")
             st.write("Bienvenido a la aplicación de gestión financiera. Por favor, inicie sesión para continuar.")
-            st.subheader("Inicio de Sesión")
             email = st.text_input("Correo Electrónico", key="login_email")
             password = st.text_input("Contraseña", type="password")
-            loginbutton = st.button("Iniciar Sesión", key="login_button")
+            loginbutton = st.button("Entrar", key="login_button", type="primary")
             if loginbutton:
                 user = login_user(email, password)
                 if "error" in user:

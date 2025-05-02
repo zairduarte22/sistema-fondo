@@ -2,18 +2,23 @@ import streamlit as st
 from utils.bcv_tasa import tasa_bs
 from views.login import login_page
 
-
 # --- PAGE SETUP ---
-
 st.set_page_config(layout='wide')
 style = 'style/style.css'
 with open(style) as e:
     st.markdown(f'<style> {e.read()} </style>', unsafe_allow_html=True)
 
+# Define logout function
+def log_out():
+    st.session_state.pop("user", None)  # Clear user session
+    st.rerun()  # Trigger a rerun to redirect to the login page
+
 # Check if user is logged in
-if "user" not in st.session_state:
+if "user" not in st.session_state or st.session_state["user"] is None:
+    # Redirect to login page
     login_page()
 else:
+    # Define navigation pages
     resumen = st.Page(
         page='views/resumen.py',
         title='Informe General',
@@ -57,28 +62,25 @@ else:
         icon=':material/attach_money:'
     )
 
+    # Initialize navigation only if it doesn't exist
     pg = st.navigation(
-        pages={
-            '👥 Gestion de Miembros' : [
-                resumen,
-                miembros,
-                facturas
-            ],
-            '🪙 Contabilidad' : [
-                ingresos,
-                gastos,
-                con_bs,
-                con_divisas
-            ]
-        }
-    )
+            pages={
+                ' Gestion de Miembros': [
+                    resumen,
+                    miembros,
+                    facturas
+                ],
+                ' Contabilidad': [
+                    ingresos,
+                    gastos,
+                    con_bs,
+                    con_divisas
+                ]
+            }
+        )
 
     # --- COMPARTIDO EN TODAS LAS PAGINAS ---
     st.logo('assets/images/LOGO.png', size='large')
     st.sidebar.write(f'**Tasa BCV: Bs. {tasa_bs()}**')
-    def logout():
-        st.session_state.pop("user", None)
-        st.rerun()
-    st.sidebar.button("Cerrar Sesión", on_click=logout)
+    st.sidebar.button("Cerrar Sesión", on_click=log_out)
     pg.run()
-    

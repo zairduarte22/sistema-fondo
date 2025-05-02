@@ -3,7 +3,8 @@ import pandas as pd
 import plotly.express as px
 from db.conexion import ConciliacionBS, ConciliacionDivisas, obtener_df, Miembro
 
-st.title('Resumen financiero')
+
+st.title('Resumen Financiero')
 
 # Lista de meses en español
 MES_EN_ESPANOL = [
@@ -33,6 +34,8 @@ with col2:
     st.metric('Total Miembros', total_miembros)
 with col3:
     st.metric('Miembros Solventes', miembros_solventes)
+    
+st.subheader('Movimientos Mensuales')
 
 col4, col5 = st.columns(2)
 with col4:
@@ -46,7 +49,7 @@ with col4:
         con_bs_grouped,
         x='Mes',
         y=['INGRESO', 'EGRESO'],
-        title='Movimientos Mensuales en Bolívares',
+        title='Bolívares',
         labels={'value': 'Monto (Bs)', 'variable': 'Tipo'},
         barmode='group',
         color_discrete_sequence=px.colors.sequential.Greens_r
@@ -64,7 +67,7 @@ with col5:
         con_div_grouped,
         x='Mes',
         y=['INGRESO', 'EGRESO'],
-        title='Movimientos Mensuales en Divisas',
+        title='Divisas',
         labels={'value': 'Monto ($)', 'variable': 'Tipo'},
         barmode='group',
         color_discrete_sequence=px.colors.sequential.Greens_r
