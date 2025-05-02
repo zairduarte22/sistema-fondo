@@ -700,38 +700,33 @@ html_content = """
             left: 148mm;
             
         }
-        .item1-desc {
-            position: absolute;
-            top: 75mm;
-            left: 20mm;
-            line-height: 1.2;
-            max-width: 120mm;  /* Ajusta según tu layout */
+        
+        .item-container {
+            width: 181mm;
+            display: flex;
+            justify-content: space-between;
+            border: 1px dashed #ccc; /* Solo para visualización */
+            margin-bottom: 5mm;
+        }
+        
+        .item-description {
+            width: 103mm;
+            text-align: left;
+            word-wrap: break-word;
             overflow-wrap: break-word;
             white-space: normal;
-            hyphens: auto;
+            background-color: rgba(255,0,0,0.1); /* Solo para visualización */
         }
-        .item1-amount {
-            position: absolute;
-            top: 75mm;
-            right: 20mm;
+        
+        .item-amount {
+            width: 32mm;
             text-align: right;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            background-color: rgba(0,255,0,0.1); /* Solo para visualización */
         }
-        .item2-desc {
-            position: absolute;
-            top: 90mm;
-            left: 20mm;
-            line-height: 1.2;
-            max-width: 120mm;  /* Ajusta según tu layout */
-            overflow-wrap: break-word;
-            white-space: normal;
-            hyphens: auto;
-        }
-        .item2-amount {
-            position: absolute;
-            top: 90mm;
-            right: 20mm;
-            text-align: right;
-        }
+    
         .total1 {
             position: absolute;
             top: 115mm;
@@ -766,16 +761,23 @@ html_content = """
     <div class="address">URB EL VALLE</div>
     <div class="id">V-127582390</div>
     
-    <div class="item1-desc">
-        CANCELACIÓN DEL 60% POR CUOTA CORRESPONDIENTE<br>
-        A ENERO 2024
-    </div>
-    <div class="item1-amount">432.00</div>
-    
-    <div class="item2-desc">
-        CANCELACIÓN DEL 20% POR CUOTA CORRESPONDIENTE A ENERO 2024
-    </div>
-    <div class="item2-amount">144.00</div>
+    <div class="item-container">
+        <div class="item-description">
+            CANCELACIÓN DEL 60% POR CUOTA CORRESPONDIENTE A ENERO 2024
+        </div>
+            <div class="item-amount">
+                432.00
+            </div>
+        </div>
+        
+        <!-- Ejemplo 2: Descripción con múltiples líneas -->
+        <div class="item-container">
+            <div class="item-description">
+                CANCELACIÓN DEL 20% POR CUOTA CORRESPONDIENTE A ENERO 2024 CON UN TEXTO MÁS LARGO QUE GENERA SALTO DE LÍNEA
+            </div>
+            <div class="item-amount">
+                144.00
+            </div>
     
     <div class="total1">576.00</div>
     <div class="dash1">-</div>
