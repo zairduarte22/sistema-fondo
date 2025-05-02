@@ -612,11 +612,9 @@ def setup_printing(html_content):
         iframe.style.position = 'fixed';
         iframe.style.right = '0';
         iframe.style.bottom = '0';
-        iframe.style.width = '205mm';
-        iframe.style.height = '148mm';
+        iframe.style.width = '0';
+        iframe.style.height = '0';
         iframe.style.border = 'none';
-        iframe.style.transform = 'scale(0.25)'; // Miniaturizar visualmente
-        iframe.style.transformOrigin = 'bottom right';
         document.body.appendChild(iframe);
         
         // Insertar contenido
