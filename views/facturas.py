@@ -680,7 +680,7 @@ html_content = """
         .date {
             position: absolute;
             top: 36mm;
-            right: 154mm;
+            right: 153mm;
         }
         .name {
             position: absolute;
