@@ -683,20 +683,20 @@ html_content = """
         }
         .name {
             position: absolute;
-            top: 48mm;
-            left: 62mm;
+            top: 43mm;
+            left: 66mm;
             font-weight: bold;
             font-size: 13.5pt;
         }
         .address {
             position: absolute;
-            top: 53mm;
-            left: 47mm;
+            top: 48mm;
+            left: 48mm;
         }
         .id {
             position: absolute;
-            top: 60mm;
-            left: 148mm;
+            top: 54mm;
+            left: 150mm;
             /* Prueba añadiendo !important para la impresión */
             /* position: absolute !important;
             top: 60mm !important;
@@ -705,13 +705,11 @@ html_content = """
 
         .item-container {
             position: absolute;
-            top: 70mm;
-            left: 16mm;
-            width: 150mm;
+            top: 65mm;
+            left: 18mm;
+            width: 180mm;
             display: flex;
             justify-content: space-between;
-            border-bottom: 1px dashed #ccc; /* Solo para visualización */
-            margin-bottom: 5mm;
         }
 
         .item-description {
@@ -738,25 +736,25 @@ html_content = """
 
         .total1 {
             position: absolute;
-            top: 115mm;
+            top: 121mm;
             right: 20mm;
             text-align: right;
         }
         .dash1 {
             position: absolute;
-            top: 120mm;
+            top: 126mm;
             right: 20mm;
             text-align: right;
         }
         .dash2 {
             position: absolute;
-            top: 125mm;
+            top: 131mm;
             right: 20mm;
             text-align: right;
         }
         .final-total {
             position: absolute;
-            top: 130mm;
+            top: 136mm;
             right: 20mm;
             text-align: right;
             font-weight: bold;
