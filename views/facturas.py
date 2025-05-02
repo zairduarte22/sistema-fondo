@@ -696,12 +696,14 @@ html_content = """
         }
         .id {
             position: absolute;
-            top: 70mm;
+            top: 60mm;
             left: 148mm;
             
         }
         
         .item-container {
+            top: 70mm;
+            left: 148mm;
             width: 181mm;
             display: flex;
             justify-content: space-between;
