@@ -667,14 +667,14 @@ html_content = """
             padding: 0;
         }
         body {
-            width: 205mm;
+            width: 210mm;
             margin: 0;
             padding: 0;
             font-family: Arial;
             font-size: 12.5pt;
         }
         .pagina {
-            width: 205mm;
+            width: 210mm;
             height: 148mm;
             position: relative;
             padding: 10mm 15mm;
