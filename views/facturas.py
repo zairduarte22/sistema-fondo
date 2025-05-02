@@ -703,7 +703,7 @@ html_content = """
             position: absolute;
             top: 70mm;
             left: 16mm;
-            width: 181mm;
+            width: 150mm;
             display: flex;
             justify-content: space-between;
             border: 1px dashed #ccc; /* Solo para visualización */
