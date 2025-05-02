@@ -687,19 +687,19 @@ html_content = """
         }
         .date {
             position: absolute;
-            top: 37mm;
-            right: 153mm;
+            top: 31mm;
+            right: 152mm;
         }
         .name {
             position: absolute;
-            top: 44mm;
+            top: 43mm;
             left: 66mm;
             font-weight: bold;
             font-size: 13.5pt;
         }
         .address {
             position: absolute;
-            top: 50mm;
+            top: 49mm;
             left: 50mm;
         }
         .id {
