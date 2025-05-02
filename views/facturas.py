@@ -664,6 +664,7 @@ html_content = """
         @page {
             size: 205mm 148mm;
             margin: 0;
+            padding: 0;
         }
         body {
             width: 205mm;
