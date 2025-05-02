@@ -666,27 +666,17 @@ html_content = """
             margin: 0;
         }
         body {
-            font-family: 'Courier New', monospace;
+            font-family: 'Arial';
             font-size: 12.5pt;
-            width: 200mm;
+            width: 205mm;
             height: 148mm;
             margin: 0;
             padding: 15mm 20mm;
             position: relative;
         }
-        .date-31 {
+        .date {
             position: absolute;
-            top: 15mm;
-            right: 75mm;
-        }
-        .date-12 {
-            position: absolute;
-            top: 15mm;
-            right: 55mm;
-        }
-        .date-2023 {
-            position: absolute;
-            top: 15mm;
+            top: 43mm;
             right: 25mm;
         }
         .name {
@@ -758,9 +748,7 @@ html_content = """
     </style>
 </head>
 <body>
-    <div class="date-31">31</div>
-    <div class="date-12">12</div>
-    <div class="date-2023">2023</div>
+    <div class="date">31  12  2025</div>
     
     <div class="name">MARIO ALFREDO SAAB</div>
     <div class="address">URB EL VALLE</div>
