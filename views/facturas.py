@@ -800,11 +800,12 @@ html_content = """
 
         .item-container2 {
             position: absolute;
-            top: 75mm;
+            top: 72mm;
             left: 27mm;
             width: 168mm;
             display: flex;
             justify-content: space-between;
+            font-size: 13.5pt;
         }
 
         .item-description2 {
