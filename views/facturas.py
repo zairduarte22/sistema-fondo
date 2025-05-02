@@ -771,8 +771,8 @@ html_content = """
         
         .date2 {
             position: absolute;
-            top: 46mm;
-            right: 139mm;
+            top: 48mm;
+            right: 143mm;
         }
         
         .name2 {
@@ -800,7 +800,7 @@ html_content = """
 
         .item-container2 {
             position: absolute;
-            top: 76mm;
+            top: 78mm;
             left: 27mm;
             width: 168mm;
             display: flex;
