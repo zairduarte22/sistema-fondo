@@ -690,6 +690,7 @@ html_content = """
             top: 31mm;
             right: 152mm;
         }
+        }
         .name {
             position: absolute;
             top: 43mm;
@@ -768,6 +769,89 @@ html_content = """
             text-align: right;
             font-weight: bold;
         }
+        .date2 {
+            position: absolute;
+            top: 31mm;
+            right: 152mm;
+        .name2 {
+            position: absolute;
+            top: 49mm;
+            left: 55mm;
+            font-weight: bold;
+            font-size: 13.5pt;
+        }
+        .address2 {
+            position: absolute;
+            top: 53mm;
+            left: 38mm;
+        }
+        .id2 {
+            position: absolute;
+            top: 60mm;
+            left: 155mm;
+            /* Prueba añadiendo !important para la impresión */
+            /* position: absolute !important;
+            top: 60mm !important;
+            left: 148mm !important; */
+        }
+
+        .item-container2 {
+            position: absolute;
+            top: 71mm;
+            left: 27mm;
+            width: 168mm;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .item-description2 {
+            width: 104mm;
+            text-align: left;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            white-space: normal;
+            /* background-color: rgba(255,0,0,0.1); /* Solo para visualización */
+        }
+
+        .item-amount2 {
+            width: 28mm;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            /* background-color: rgba(0,255,0,0.1); /* Solo para visualización */
+            /* Prueba añadiendo !important para la impresión */
+            /* display: flex !important;
+            flex-direction: column !important;
+            justify-content: flex-end !important; */
+        }
+
+        .total12 {
+            position: absolute;
+            top: 115mm;
+            right: 18mm;
+            text-align: right;
+        }
+        .dash12 {
+            position: absolute;
+            top: 125mm;
+            right: 18mm;
+            text-align: right;
+        }
+        .dash22 {
+            position: absolute;
+            top: 132mm;
+            right: 18mm;
+            text-align: right;
+        }
+        .final-total2 {
+            position: absolute;
+            top: 131mm;
+            right: 18mm;
+            text-align: right;
+            font-weight: bold;
+        }
+
 
         /* Estilos específicos para la impresión (prueba aquí) */
         @media print {
@@ -816,25 +900,25 @@ html_content = """
 
     <!-- SEGUNDA PÁGINA (MONTOS ACTUALIZADOS) -->
     <div class="pagina">
-        <div class="date">31 &emsp;12 &emsp;2025</div>
+        <div class="date2">31 &emsp;12 &emsp;2025</div>
     
-        <div class="name">MARIO ROMERO</div>
-        <div class="address">URB EL VALLE</div>
-        <div class="id">V-127582390</div>
+        <div class="name2">MARIO ROMERO</div>
+        <div class="address2">URB EL VALLE</div>
+        <div class="id2">V-127582390</div>
     
-        <div class="item-container">
-            <div class="item-description">
+        <div class="item-container2">
+            <div class="item-description2">
                 CANCELACIÓN DEL 20% POR CUOTA CORRESPONDIENTE A ENERO 2024 CON UN TEXTO MÁS LARGO QUE GENERA SALTO DE LÍNEA
             </div>
-            <div class="item-amount">
+            <div class="item-amount2">
                 144.00
             </div>
         </div>
     
-        <div class="total1">576.00</div>
-        <div class="dash1">-</div>
-        <div class="dash2">-</div>
-        <div class="final-total">576.00</div>
+        <div class="total12">576.00</div>
+        <div class="dash12">-</div>
+        <div class="dash22">-</div>
+        <div class="final-total2">576.00</div>
     </div>
 </body>
 </html>
