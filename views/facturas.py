@@ -702,8 +702,8 @@ html_content = """
         }
         
         .item-container {
-            top: 70mm;
-            left: 148mm;
+            margin-top: 70mm;
+            margin-left: 0mm;
             width: 181mm;
             display: flex;
             justify-content: space-between;
