@@ -662,19 +662,19 @@ html_content = """
 <head>
     <style>
         @page {
-            size: 210mm 148mm;
+            size: 205mm 148mm;
             margin: 0;
             padding: 0;
         }
         body {
-            width: 210mm;
+            width: 205mm;
             margin: 0;
             padding: 0;
             font-family: Arial;
             font-size: 12.5pt;
         }
         .pagina {
-            width: 210mm;
+            width: 205mm;
             height: 148mm;
             position: relative;
             padding: 10mm 15mm;
