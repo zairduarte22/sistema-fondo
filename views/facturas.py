@@ -670,7 +670,7 @@ html_content = """
             width: 205mm;
             height: 148mm;
             margin: 0;
-            padding: 10mm 15mm;
+            padding: 0mm;
             font-family: Arial;
             font-size: 12.5pt;
             position: relative;
