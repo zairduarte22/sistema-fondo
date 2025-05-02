@@ -704,7 +704,7 @@ html_content = """
         .item-container {
             position: absolute;
             top: 70mm;
-            left: 47mm;
+            left: 16mm;
             width: 181mm;
             display: flex;
             justify-content: space-between;
