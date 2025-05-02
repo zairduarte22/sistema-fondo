@@ -694,7 +694,6 @@ html_content = """
             position: absolute;
             top: 43mm;
             left: 66mm;
-            font-weight: bold;
             font-size: 13.5pt;
         }
         .address {
@@ -766,7 +765,6 @@ html_content = """
             top: 136mm;
             right: 20mm;
             text-align: right;
-            font-weight: bold;
         }
         
         .date2 {
