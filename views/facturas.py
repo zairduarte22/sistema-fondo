@@ -677,7 +677,7 @@ html_content = """
         .date {
             position: absolute;
             top: 43mm;
-            right: 175mm;
+            right: 184mm;
         }
         .name {
             position: absolute;
@@ -748,7 +748,7 @@ html_content = """
     </style>
 </head>
 <body>
-    <div class="date">31  12  2025</div>
+    <div class="date">31   12   2025</div>
     
     <div class="name">MARIO ALFREDO SAAB</div>
     <div class="address">URB EL VALLE</div>
