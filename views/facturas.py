@@ -773,6 +773,7 @@ html_content = """
             position: absolute;
             top: 31mm;
             right: 152mm;
+        }
         .name2 {
             position: absolute;
             top: 49mm;
