@@ -620,7 +620,7 @@ def setup_printing(html_content):
         // Insertar contenido
         var iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
         iframeDoc.open();
-        iframeDoc.write({html_content});
+        iframeDoc.write(`{html_content}`);
         iframeDoc.close();
         
         // Guardar referencia
@@ -649,6 +649,7 @@ def setup_printing(html_content):
     </button>
     """
     html(js)
+
 
 
 fecha_actual = datetime.now().strftime("%d/%m/%Y")
