@@ -657,7 +657,134 @@ usuario = "John Doe"
 total = 1250.75
 
 html_content = """
-<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><meta http-equiv="Content-Style-Type" content="text/css" /><meta name="generator" content="Aspose.Words for .NET 25.4.0" /><title></title><style type="text/css">body { font-family:'Times New Roman'; font-size:12pt }p { margin:0pt }</style></head><body><div><p style="margin-top:65.3pt; margin-left:16.8pt; text-align:justify; line-height:15.85pt"><span style="font-family:Calibri; font-size:13pt">31</span><span style="font-family:Calibri; font-size:13pt; letter-spacing:24.25pt"> </span><span style="font-family:Calibri; font-size:13pt">12</span><span style="font-family:Calibri; font-size:13pt; letter-spacing:23.6pt"> </span><span style="font-family:Calibri; font-size:13pt">2023</span></p><p style="margin-top:3.4pt; margin-right:283.55pt; margin-left:162.15pt; line-height:19.5pt"><span style="font-family:Calibri; font-size:13pt">MARIO</span><span style="font-family:Calibri; font-size:13pt; letter-spacing:5.9pt"> </span><span style="font-family:Calibri; font-size:13pt">ALFREDO</span><span style="font-family:Calibri; font-size:13pt; letter-spacing:9.3pt"> </span><span style="font-family:Calibri; font-size:13pt">SAAB URB</span><span style="font-family:Calibri; font-size:13pt; letter-spacing:4.85pt"> </span><span style="font-family:Calibri; font-size:13pt">EL</span><span style="font-family:Calibri; font-size:13pt; letter-spacing:1.4pt"> </span><span style="font-family:Calibri; font-size:13pt">VALLE</span></p><p style="margin-top:3.65pt; margin-left:520.85pt; text-align:justify; line-height:15.85pt"><span style="font-family:Calibri; font-size:13pt">V-127582390</span></p><p style="margin-top:27.6pt; text-align:justify; line-height:17.05pt"><span style="font-family:Calibri; font-size:14pt">CANCELACIÓN</span><span style="font-family:Calibri; font-size:14pt; letter-spacing:8.2pt"> </span><span style="font-family:Calibri; font-size:14pt">DEL</span><span style="font-family:Calibri; font-size:14pt; letter-spacing:1.75pt"> </span><span style="font-family:Calibri; font-size:14pt">60%</span><span style="font-family:Calibri; font-size:14pt; letter-spacing:2.25pt"> </span><span style="font-family:Calibri; font-size:14pt">POR</span><span style="font-family:Calibri; font-size:14pt; letter-spacing:2.35pt"> </span><span style="font-family:Calibri; font-size:14pt">CUOTA</span><span style="font-family:Calibri; font-size:14pt; letter-spacing:3.95pt"> </span><span style="font-family:Calibri; font-size:14pt">CORRESPONDIENTE</span></p><p style="margin-top:4.75pt; margin-right:1.45pt; line-height:18.15pt"><span style="font-family:Calibri; font-size:14pt">A</span><span style="font-family:Calibri; font-size:14pt; letter-spacing:2.2pt"> </span><span style="font-family:Calibri; font-size:14pt">ENERO</span><span style="font-family:Calibri; font-size:14pt; letter-spacing:3pt"> </span><span style="font-family:Calibri; font-size:14pt">2024</span><span style="font-family:Calibri; font-size:14pt; letter-spacing:450.25pt"> </span><span style="font-family:Calibri; font-size:14pt">432.00 CANCELACIÓN</span><span style="font-family:Calibri; font-size:14pt; letter-spacing:8.2pt"> </span><span style="font-family:Calibri; font-size:14pt">DEL</span><span style="font-family:Calibri; font-size:14pt; letter-spacing:1.75pt"> </span><span style="font-family:Calibri; font-size:14pt">20%</span><span style="font-family:Calibri; font-size:14pt; letter-spacing:2.25pt"> </span><span style="font-family:Calibri; font-size:14pt">POR</span><span style="font-family:Calibri; font-size:14pt; letter-spacing:2.35pt"> </span><span style="font-family:Calibri; font-size:14pt">CUOTA</span><span style="font-family:Calibri; font-size:14pt; letter-spacing:3.95pt"> </span><span style="font-family:Calibri; font-size:14pt">CORRESPONDIENTE</span></p><p style="margin-top:5.8pt; text-align:justify; line-height:17.05pt"><span style="font-family:Calibri; font-size:14pt">A</span><span style="font-family:Calibri; font-size:14pt; letter-spacing:2.2pt"> </span><span style="font-family:Calibri; font-size:14pt">ENERO</span><span style="font-family:Calibri; font-size:14pt; letter-spacing:3pt"> </span><span style="font-family:Calibri; font-size:14pt">2024</span><span style="font-family:Calibri; font-size:14pt; letter-spacing:450.95pt"> </span><span style="font-family:Calibri; font-size:14pt">144.00</span></p><p style="margin-top:118.9pt; margin-left:541pt; text-align:justify; line-height:17.05pt"><span style="font-family:Calibri; font-size:14pt">576.00</span></p></div></body></html>
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        @page {
+            size: 200mm 148mm;
+            margin: 0;
+        }
+        body {
+            font-family: 'Courier New', monospace;
+            font-size: 12.5pt;
+            width: 200mm;
+            height: 148mm;
+            margin: 0;
+            padding: 15mm 20mm;
+            position: relative;
+        }
+        .date-31 {
+            position: absolute;
+            top: 15mm;
+            right: 75mm;
+        }
+        .date-12 {
+            position: absolute;
+            top: 15mm;
+            right: 55mm;
+        }
+        .date-2023 {
+            position: absolute;
+            top: 15mm;
+            right: 25mm;
+        }
+        .name {
+            position: absolute;
+            top: 35mm;
+            left: 20mm;
+            font-weight: bold;
+            font-size: 13.5pt;
+        }
+        .address {
+            position: absolute;
+            top: 45mm;
+            left: 20mm;
+        }
+        .id {
+            position: absolute;
+            top: 55mm;
+            left: 20mm;
+        }
+        .item1-desc {
+            position: absolute;
+            top: 75mm;
+            left: 20mm;
+            line-height: 1.2;
+        }
+        .item1-amount {
+            position: absolute;
+            top: 75mm;
+            right: 20mm;
+            text-align: right;
+        }
+        .item2-desc {
+            position: absolute;
+            top: 90mm;
+            left: 20mm;
+            line-height: 1.2;
+        }
+        .item2-amount {
+            position: absolute;
+            top: 90mm;
+            right: 20mm;
+            text-align: right;
+        }
+        .total1 {
+            position: absolute;
+            top: 115mm;
+            right: 20mm;
+            text-align: right;
+        }
+        .dash1 {
+            position: absolute;
+            top: 120mm;
+            right: 20mm;
+            text-align: right;
+        }
+        .dash2 {
+            position: absolute;
+            top: 125mm;
+            right: 20mm;
+            text-align: right;
+        }
+        .final-total {
+            position: absolute;
+            top: 130mm;
+            right: 20mm;
+            text-align: right;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="date-31">31</div>
+    <div class="date-12">12</div>
+    <div class="date-2023">2023</div>
+    
+    <div class="name">MARIO ALFREDO SAAB</div>
+    <div class="address">URB EL VALLE</div>
+    <div class="id">V-127582390</div>
+    
+    <div class="item1-desc">
+        CANCELACIÓN DEL 60% POR CUOTA CORRESPONDIENTE<br>
+        A ENERO 2024
+    </div>
+    <div class="item1-amount">432.00</div>
+    
+    <div class="item2-desc">
+        CANCELACIÓN DEL 20% POR CUOTA CORRESPONDIENTE<br>
+        A ENERO 2024
+    </div>
+    <div class="item2-amount">144.00</div>
+    
+    <div class="total1">576.00</div>
+    <div class="dash1">-</div>
+    <div class="dash2">-</div>
+    <div class="final-total">576.00</div>
+</body>
+</html>
+"""
 """
 
 
