@@ -600,42 +600,56 @@ with botones:
                     mime="application/pdf"
                 )
                 
-import streamlit as st
-import streamlit.components.v1 as components
-import uuid
-
 def setup_printing(html_content):
-    button_id = f"print-btn-{uuid.uuid4()}"
-
+    iframe_id = f"print-frame-{uuid.uuid4()}"
+    
     js = f"""
     <script>
-    function printInNewWindow() {{
-        var printWindow = window.open('', '_blank');
-        printWindow.document.write(`{html_content}`);
-        printWindow.document.close();
-        printWindow.focus();
-        printWindow.print();
+    function preparePrint() {{
+        // Crear iframe oculto
+        var iframe = document.createElement('iframe');
+        iframe.id = '{iframe_id}';
+        iframe.style.position = 'fixed';
+        iframe.style.right = '0';
+        iframe.style.bottom = '0';
+        iframe.style.width = '0';
+        iframe.style.height = '0';
+        iframe.style.border = 'none';
+        document.body.appendChild(iframe);
+        
+        // Insertar contenido
+        var iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+        iframeDoc.open();
+        iframeDoc.write({html_content});
+        iframeDoc.close();
+        
+        // Guardar referencia
+        window.printIframe = iframe;
+        
+        // Mostrar botón real de impresión
+        document.getElementById('print-btn-hidden').style.display = 'block';
     }}
+    
+    function executePrint() {{
+        if (window.printIframe) {{
+            window.printIframe.contentWindow.focus();
+            window.printIframe.contentWindow.print();
+        }}
+    }}
+    
+    // Preparar al cargar la página
+    window.addEventListener('load', preparePrint);
     </script>
-
-    <button id="{button_id}" onclick="printInNewWindow()" style="
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        z-index: 1000;
-        padding: 10px 20px;
-        background-color: #4CAF50;
-        color: white;
-        border: none;
-        border-radius: 6px;
-        font-size: 16px;
-        cursor: pointer;">
-        🖨️ Imprimir
+    
+    <button id="print-btn-hidden" 
+            onclick="executePrint()" 
+            style="display: none; position: fixed; right: 20px; bottom: 20px; z-index: 1000;"
+            class="stButton">
+        🖨️ Abrir Diálogo de Impresión
     </button>
     """
-    
-    components.html(js, height=0, width=0)  # inyectar JS invisible
-    st.markdown(f'<div>{js}</div>', unsafe_allow_html=True)
+    html(js)
+
 
 fecha_actual = datetime.now().strftime("%d/%m/%Y")
 usuario = "John Doe"
