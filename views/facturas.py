@@ -662,7 +662,7 @@ html_content = """
 <head>
     <style>
         @page {
-            size: 200mm 148mm;
+            size: 205mm 148mm;
             margin: 0;
         }
         body {
