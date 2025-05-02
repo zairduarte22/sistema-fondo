@@ -769,11 +769,13 @@ html_content = """
             text-align: right;
             font-weight: bold;
         }
+        
         .date2 {
             position: absolute;
             top: 31mm;
             right: 152mm;
         }
+        
         .name2 {
             position: absolute;
             top: 49mm;
@@ -781,11 +783,13 @@ html_content = """
             font-weight: bold;
             font-size: 13.5pt;
         }
+        
         .address2 {
             position: absolute;
             top: 53mm;
             left: 38mm;
         }
+        
         .id2 {
             position: absolute;
             top: 60mm;
