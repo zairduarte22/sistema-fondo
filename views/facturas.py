@@ -710,7 +710,7 @@ html_content = """
         }
         
         .item-description {
-            width: 103mm;
+            width: 104mm;
             text-align: left;
             word-wrap: break-word;
             overflow-wrap: break-word;
