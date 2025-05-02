@@ -660,10 +660,9 @@ html_content = """
 <head>
     <style>
         @page {
-            size: 205mm 148mm; /* Tamaño real del papel */
-            margin: 0 !important; /* Elimina márgenes del navegador */
+            size: A5 landscape; /* Forzar orientación horizontal */
+            margin: 0;
             padding: 0;
-            orientation: portrait !important;
         }
         body {
             font-family: 'Arial';
