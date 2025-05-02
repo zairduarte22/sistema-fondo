@@ -673,6 +673,7 @@ html_content = """
             margin: 0;
             padding: 15mm 20mm;
             position: relative;
+            background-color: green;
         }
         .date {
             position: absolute;
