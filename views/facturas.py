@@ -600,91 +600,88 @@ with botones:
                     mime="application/pdf"
                 )
                 
-            
 
 def setup_printing(html_content):
     iframe_id = f"print-frame-{uuid.uuid4()}"
-    
-    # Añadir metadatos de orientación directamente en el HTML
-    html_content = f"""
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <style>
-            @page {{
-                size: 205mm 148mm;
-                margin: 0;
-                padding: 0;
-                orientation: portrait; /* Fuerza vertical */
-            }}
-            body {{
-                width: 205mm;
-                height: 148mm;
-                margin: 0;
-                padding: 0;
-                transform: rotate(0deg); /* Bloquea rotación */
-                overflow: hidden;
-            }}
-        </style>
-    </head>
-    <body>
-        {html_content}
-    </body>
-    </html>
-    """
+    btn_id = f"print-btn-{uuid.uuid4()}"
     
     js = f"""
     <script>
-    function preparePrint() {{
-        // Crear iframe con estilos de impresión
+    function setupPrinting() {{
+        // 1. Crear iframe oculto
         var iframe = document.createElement('iframe');
         iframe.id = '{iframe_id}';
         iframe.style.position = 'fixed';
         iframe.style.right = '0';
         iframe.style.bottom = '0';
-        iframe.style.width = '205mm';  // Tamaño exacto
-        iframe.style.height = '148mm';
+        iframe.style.width = '0';
+        iframe.style.height = '0';
         iframe.style.border = 'none';
-        iframe.style.transform = 'scale(0.1)'; // Miniaturizar visualmente
         document.body.appendChild(iframe);
         
-        // Insertar contenido con estilos
-        var iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-        iframeDoc.open();
-        iframeDoc.write(`{html_content}`);
-        iframeDoc.close();
+        // 2. Insertar HTML con estilos de impresión
+        var printContent = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <style>
+                @page {{
+                    size: 205mm 148mm;
+                    margin: 0;
+                    orientation: portrait !important;
+                }}
+                body {{
+                    width: 205mm;
+                    height: 148mm;
+                    margin: 0;
+                    padding: 10mm;
+                    transform: rotate(0deg);
+                }}
+            </style>
+        </head>
+        <body>
+            {html_content}
+        </body>
+        </html>
+        `;
         
-        // Configurar antes de imprimir
-        window.printIframe = iframe;
-        iframe.contentWindow.onbeforeprint = function() {{
-            iframe.style.width = '100%';
-            iframe.style.height = '100%';
+        iframe.contentDocument.open();
+        iframe.contentDocument.write(printContent);
+        iframe.contentDocument.close();
+        
+        // 3. Crear botón visible (con estilos resistentes a Streamlit)
+        var btn = document.createElement('button');
+        btn.id = '{btn_id}';
+        btn.innerHTML = '🖨️ Imprimir';
+        btn.style.position = 'fixed';
+        btn.style.right = '20px';
+        btn.style.bottom = '20px';
+        btn.style.zIndex = '999999';
+        btn.style.padding = '10px 20px';
+        btn.style.backgroundColor = '#ff4b4b';
+        btn.style.color = 'white';
+        btn.style.border = 'none';
+        btn.style.borderRadius = '4px';
+        btn.style.fontSize = '16px';
+        btn.style.cursor = 'pointer';
+        btn.onclick = function() {{
+            iframe.contentWindow.focus();
+            iframe.contentWindow.print();
         }};
+        
+        document.body.appendChild(btn);
     }}
     
-    function executePrint() {{
-        if (window.printIframe) {{
-            window.printIframe.contentWindow.focus();
-            // Forzar configuración de impresión
-            try {{
-                window.printIframe.contentWindow.document.execCommand('print', false, null);
-            }} catch (e) {{
-                window.printIframe.contentWindow.print();
-            }}
-        }}
+    // Ejecutar después de que la página cargue
+    if (document.readyState === 'complete') {{
+        setupPrinting();
+    }} else {{
+        window.addEventListener('load', setupPrinting);
     }}
-    
-    window.addEventListener('load', preparePrint);
     </script>
-    
-    <button id="print-btn-hidden" 
-            onclick="executePrint()" 
-            style="display: none; position: fixed; right: 20px; bottom: 20px; z-index: 1000;"
-            class="stButton">
-        🖨️ Imprimir Documento
-    </button>
     """
-    return html(js)
+    
+    html(js, height=0)
 
 fecha_actual = datetime.now().strftime("%d/%m/%Y")
 usuario = "John Doe"
