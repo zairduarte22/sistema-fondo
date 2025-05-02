@@ -672,12 +672,12 @@ html_content = """
             padding: 0;
             font-family: Arial;
             font-size: 12.5pt;
+            position: relative;
         }
         .pagina {
             width: 205mm;
             height: 148mm;
             position: relative;
-            padding: 10mm 15mm;
             page-break-after: always;
             overflow: hidden;
         }
