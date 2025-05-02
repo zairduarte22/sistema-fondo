@@ -678,7 +678,7 @@ html_content = """
         }
         .date {
             position: absolute;
-            top: 36mm;
+            top: 37mm;
             right: 153mm;
         }
         .name {
@@ -690,12 +690,12 @@ html_content = """
         }
         .address {
             position: absolute;
-            top: 48mm;
-            left: 48mm;
+            top: 43mm;
+            left: 50mm;
         }
         .id {
             position: absolute;
-            top: 54mm;
+            top: 56mm;
             left: 150mm;
             /* Prueba añadiendo !important para la impresión */
             /* position: absolute !important;
@@ -705,7 +705,7 @@ html_content = """
 
         .item-container {
             position: absolute;
-            top: 65mm;
+            top: 67mm;
             left: 18mm;
             width: 180mm;
             display: flex;
