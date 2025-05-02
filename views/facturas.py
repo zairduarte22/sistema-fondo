@@ -679,85 +679,74 @@ html_content = """
         }
         .date {
             position: absolute;
-            top: 15mm;
-            right: 15mm;
+            top: 46mm;
+            right: 180mm;
         }
         .name {
             position: absolute;
-            top: 15mm;
-            left: 15mm;
+            top: 35mm;
+            left: 20mm;
             font-weight: bold;
             font-size: 13.5pt;
         }
         .address {
             position: absolute;
-            top: 30mm;
-            left: 15mm;
+            top: 45mm;
+            left: 20mm;
         }
         .id {
             position: absolute;
-            top: 40mm;
-            left: 15mm;
+            top: 55mm;
+            left: 20mm;
         }
         .item1-desc {
             position: absolute;
-            top: 60mm;
-            left: 15mm;
+            top: 75mm;
+            left: 20mm;
             line-height: 1.2;
-            width: 120mm;
         }
         .item1-amount {
             position: absolute;
-            top: 60mm;
-            right: 15mm;
+            top: 75mm;
+            right: 20mm;
             text-align: right;
         }
         .item2-desc {
             position: absolute;
-            top: 75mm;
-            left: 15mm;
+            top: 90mm;
+            left: 20mm;
             line-height: 1.2;
-            width: 120mm;
         }
         .item2-amount {
             position: absolute;
-            top: 75mm;
-            right: 15mm;
+            top: 90mm;
+            right: 20mm;
             text-align: right;
         }
         .total1 {
             position: absolute;
-            top: 100mm;
-            right: 15mm;
+            top: 115mm;
+            right: 20mm;
             text-align: right;
         }
         .dash1 {
             position: absolute;
-            top: 105mm;
-            right: 15mm;
+            top: 120mm;
+            right: 20mm;
             text-align: right;
         }
         .dash2 {
             position: absolute;
-            top: 110mm;
-            right: 15mm;
+            top: 125mm;
+            right: 20mm;
             text-align: right;
         }
         .final-total {
             position: absolute;
-            top: 115mm;
-            right: 15mm;
+            top: 130mm;
+            right: 20mm;
             text-align: right;
             font-weight: bold;
-        }
-        
-        /* Garantiza que no haya saltos de página */
-        @media print {
-            body {
-                height: 148mm;
-                page-break-after: avoid;
-                page-break-inside: avoid;
-            }
         }
     </style>
 </head>
@@ -786,6 +775,7 @@ html_content = """
     <div class="final-total">576.00</div>
 </body>
 </html>
+"""
 """
 
 # Configurar el sistema de impresión
