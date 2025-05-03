@@ -79,8 +79,8 @@ def invoice_model(date: datetime, name: str, adress: str, id: str, month: str, m
                 }}
                 .date {{
                     position: absolute;
-                    top: 31mm;
-                    right: 152mm;
+                    top: 35mm;
+                    right: 154mm;
                 }}
                 .name {{
                     position: absolute;
@@ -95,7 +95,7 @@ def invoice_model(date: datetime, name: str, adress: str, id: str, month: str, m
                 }}
                 .id {{
                     position: absolute;
-                    top: 54mm;
+                    top: 53mm;
                     left: 150mm;
                     /* Prueba añadiendo !important para la impresión */
                     /* position: absolute !important;
@@ -105,12 +105,12 @@ def invoice_model(date: datetime, name: str, adress: str, id: str, month: str, m
         
                 .items-wrapper {{
                     position: absolute;
-                    top: 67mm;
+                    top: 66mm;
                     left: 18mm;
                     width: 180mm;
                     display: flex;
                     flex-direction: column;  /* Apila los elementos verticalmente */
-                    gap: 8mm;  /* Espacio entre elementos */
+                    gap: 1mm;  /* Espacio entre elementos */
                 }}
                 
                 .item-container {{
@@ -310,7 +310,7 @@ def invoice_model(date: datetime, name: str, adress: str, id: str, month: str, m
         
             <!-- SEGUNDA PÁGINA (MONTOS ACTUALIZADOS) -->
             <div class="pagina">
-                <div class="date2">{day} &emsp;{month_date} &emsp;{year}</div>
+                <div class="date2">{day}&emsp&emsp;{month_date} &emsp;{year}</div>
             
                 <div class="name2">{name}</div>
                 <div class="address2">{adress}</div>
