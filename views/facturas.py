@@ -120,7 +120,7 @@ def agregar_factura():
                 st.rerun()
         with col11:
             if st.button(':material/print: Imprimir'):
-                 setup_printing(html_content=invoice_model(
+                setup_printing(html_content=invoice_model(
                     date=fecha, 
                     name=razon_social, 
                     adress=miembros_completo.loc[miembros_completo['RAZON_SOCIAL'] == razon_social, 'DIRECCION'].values[0], 
