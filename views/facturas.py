@@ -10,8 +10,8 @@ from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, Image
 from reportlab.lib.units import inch
-from streamlit.components.v1 import html
-import uuid
+from utils.print_invoice import invoice_model, setup_printing
+from utils.informes_pdf import generar_factura_pdf
 
 
 
@@ -32,145 +32,6 @@ if 'selected_factura' not in st.session_state:
 facturas = obtener_df(FactCuota)
 miembros = obtener_df(Miembro)
 miembros_completo = obtener_df_join(Miembro, InformacionMiembro)
-
-def generar_factura_pdf(factura):
-    """
-    Genera un archivo PDF de la factura seleccionada.
-
-    Args:
-        factura (dict): Diccionario con los datos de la factura seleccionada.
-
-    Returns:
-        io.BytesIO: Archivo PDF generado en memoria.
-    """
-    pdf_output = io.BytesIO()
-    doc = SimpleDocTemplate(pdf_output, pagesize=letter)
-
-    # Estilos
-    styles = getSampleStyleSheet()
-    title_style = ParagraphStyle(
-        "Title",
-        parent=styles["Heading1"],
-        fontSize=18,
-        alignment=1,  # Centrado
-        spaceAfter=20
-    )
-    normal_style = styles["Normal"]
-    bold_style = ParagraphStyle(
-        "Bold",
-        parent=normal_style,
-        fontName="Helvetica-Bold"
-    )
-
-    # Contenido de la factura
-    elements = []
-
-    # Logo y datos de la empresa
-    try:
-        logo = Image("assets/images/LOGO.png", width=1.5 * inch, height=1.5 * inch)
-    except:
-        logo = None
-
-    business_data = [
-        ["FONDO DE UGAVI PARA DESARROLLO AGROPECUARIO"],
-        ["RIF: J-30646602-9"],
-        ["Dirección Fiscal: Av. 23 Sector Aurora, Edificio UGAVI"],
-        ["Teléfono: 0412 786 6851"]
-    ]
-    business_table = Table(business_data, colWidths=[4.5 * inch])
-    business_table.setStyle(TableStyle([
-        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica-Bold'),
-        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-    ]))
-
-    header_table = Table([[business_table, logo]], colWidths=[4.5 * inch, 1.5 * inch])
-    header_table.setStyle(TableStyle([
-        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
-    ]))
-    elements.append(header_table)
-    elements.append(Spacer(1, 0.25 * inch))
-
-    # Fecha de emisión y número de factura
-    invoice_data = [
-        ["Fecha de Emisión:", factura.get("FECHA", "").strftime("%d/%m/%Y"), "", "N° de Factura:", factura.get("FACT_FONDO", "")],
-        ["", "", "", "Estado:", factura.get("ESTADO", "")]
-    ]
-    invoice_table = Table(invoice_data, colWidths=[1.5 * inch, 2 * inch, 0.5 * inch, 1.5 * inch, 2 * inch])
-    invoice_table.setStyle(TableStyle([
-        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica-Bold'),
-        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-        ('LINEBELOW', (0, 0), (-1, 0), 1, colors.black),
-    ]))
-    elements.append(invoice_table)
-    elements.append(Spacer(1, 0.25 * inch))
-
-    # Validar si existe un cliente correspondiente al ID_MIEMBRO
-    cliente_data = miembros_completo.loc[miembros_completo['RAZON_SOCIAL'] == factura.get("ID_MIEMBRO")]
-    if cliente_data.empty:
-        cliente = {"RAZON_SOCIAL": "N/A", "RIF": "N/A", "DIRECCION": "N/A"}
-    else:
-        cliente = cliente_data.iloc[0]
-
-    # Datos del cliente
-    client_data = [
-        ["DATOS DEL CLIENTE"],
-        ["Razón Social:", cliente["RAZON_SOCIAL"]],
-        ["RIF:", cliente["RIF"]],
-        ["Dirección:", cliente["DIRECCION"]]
-    ]
-    client_table = Table(client_data, colWidths=[2.5 * inch, 4.5 * inch])
-    client_table.setStyle(TableStyle([
-        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-    ]))
-    elements.append(client_table)
-    elements.append(Spacer(1, 0.25 * inch))
-
-    # Detalles de la factura
-    item_data = [
-        ["DESCRIPCIÓN", "MONTO (Bs)"],
-        [factura.get('MENSUALIDADES'), f"Bs. {factura.get('MONTO_BS', 0):.2f}"]
-    ]
-    item_table = Table(item_data, colWidths=[4.5 * inch, 2 * inch])
-    item_table.setStyle(TableStyle([
-        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-        ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),
-        ('ALIGN', (1, 0), (-1, -1), 'CENTER'),
-        ('BOX', (0, 0), (-1, -1), 1, colors.black),
-        ('INNERGRID', (0, 0), (-1, -1), 1, colors.black),
-    ]))
-    elements.append(item_table)
-    elements.append(Spacer(1, 0.5 * inch))
-
-    # Total general
-    total_data = [
-        ["Total General (Bs):", f"Bs. {factura.get('MONTO_BS', 0):.2f}"]
-    ]
-    total_table = Table(total_data, colWidths=[4.5 * inch, 2 * inch])
-    total_table.setStyle(TableStyle([
-        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica-Bold'),
-        ('ALIGN', (1, 0), (1, -1), 'RIGHT'),
-        ('LINEABOVE', (0, 0), (-1, 0), 1, colors.black),
-    ]))
-    elements.append(total_table)
-    elements.append(Spacer(1, 0.5 * inch))
-
-    # Pie de página: Método de Pago
-    footer_data = [
-        ["Método de Pago:", factura.get("METODO_PAGO", "")]
-    ]
-    footer_table = Table(footer_data, colWidths=[2.5 * inch, 4.5 * inch])
-    footer_table.setStyle(TableStyle([
-        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica-Bold'),
-        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-    ]))
-    elements.append(footer_table)
-
-    # Generar el PDF
-    doc.build(elements)
-    pdf_output.seek(0)
-    return pdf_output
 
 
 @st.dialog("Agregar Nueva Factura", width="large")
@@ -194,9 +55,7 @@ def agregar_factura():
     with col7:
         z = lambda x: float(miembros[miembros['RAZON_SOCIAL'] == razon_social]['SALDO']) if x is not None else 0.00
         saldo = z(razon_social)
-        print(saldo)
         y = lambda x: x*-1 if x < 0.00 else 0.00
-        print(y(saldo))
         monto_divisas = st.number_input('Monto ($)', value=y(saldo))
         x = lambda x: 0.00 if x == 0.00 else x*tasa_bs()
         monto_bs = st.number_input('Monto (Bs.)', format="%.2f", value=x(monto_divisas))
@@ -259,6 +118,16 @@ def agregar_factura():
                 mensaje = f'Error al insertar la nueva factura. Error: {e}'
                 st.session_state.notificacion = mensaje
                 st.rerun()
+        with col11:
+            if st.button(':material/print: Imprimir'):
+                 setup_printing(html_content=invoice_model(
+                    date=fecha, 
+                    name=razon_social, 
+                    adress=miembros_completo.loc[miembros_completo['RAZON_SOCIAL'] == razon_social, 'DIRECCION'].values[0], 
+                    id=miembros.loc[miembros['RAZON_SOCIAL'] == razon_social, 'RIF'].values[0], 
+                    month=mensualidades, 
+                    monto=monto_bs))
+                
 
 @st.dialog('Editar Factura', width="large")
 def editar_factura():
@@ -592,352 +461,13 @@ with botones:
             generar_factura = st.button(':material/receipt: Generar Factura', type='primary')
             if generar_factura and seleccion:
                 factura_seleccionada = facturas_completo.iloc[seleccion[0]].to_dict()
-                pdf_file = generar_factura_pdf(factura_seleccionada)
+                pdf_file = generar_factura_pdf(factura_seleccionada, miembros_completo)
                 st.download_button(
                     label="Descargar Factura",
                     data=pdf_file,
                     file_name=f"Factura_{factura_seleccionada['FACT_FONDO']}.pdf",
                     mime="application/pdf"
                 )
-                
-def setup_printing(html_content):
-    iframe_id = f"print-frame-{uuid.uuid4()}"
-    
-    js = f"""
-    <script>
-    function preparePrint() {{
-        // Crear iframe oculto
-        var iframe = document.createElement('iframe');
-        iframe.id = '{iframe_id}';
-        iframe.style.position = 'fixed';
-        iframe.style.right = '0';
-        iframe.style.bottom = '0';
-        iframe.style.width = '0';
-        iframe.style.height = '0';
-        iframe.style.border = 'none';
-        document.body.appendChild(iframe);
-        
-        // Insertar contenido
-        var iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-        iframeDoc.open();
-        iframeDoc.write(`{html_content}`);
-        iframeDoc.close();
-        
-        // Guardar referencia
-        window.printIframe = iframe;
-        
-        // Mostrar botón real de impresión
-        document.getElementById('print-btn-hidden').style.display = 'block';
-    }}
-    
-    function executePrint() {{
-        if (window.printIframe) {{
-            window.printIframe.contentWindow.focus();
-            window.printIframe.contentWindow.print();
-        }}
-    }}
-    
-    // Preparar al cargar la página
-    window.addEventListener('load', preparePrint);
-    </script>
-    
-    <button id="print-btn-hidden" 
-            onclick="executePrint()" 
-            style="display: none; position: fixed; right: 20px; bottom: 20px; z-index: 1000;"
-            class="stButton">
-        🖨️ Abrir Diálogo de Impresión
-    </button>
-    """
-    html(js)
 
-
-
-fecha_actual = datetime.now().strftime("%d/%m/%Y")
-usuario = "John Doe"
-total = 1250.75
-
-def invoice(date: datatime, name: str, adress: str, id: str, month: str, monto: float):
-    day = date.day()
-    month_date = date.month()
-    year = date.year()
-    name = name
-    adress = adress
-    id = id
-    month = month
-    monto = monto
-    monto_ugavi = monto * 0.6
-    monto_fondo = monto * 0.2
-    total1 = monto_ugavi + monto_fondo
-    html_content = """
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <style>
-            @page {
-                size: 205mm 148mm;
-                margin: 0;
-                padding: 0;
-            }
-            body {
-                width: 205mm;
-                margin: 0;
-                padding: 0;
-                padding: 4mm;
-                font-family: Arial;
-                font-size: 12.5pt;
-                position: relative;
-            }
-            .pagina {
-                width: 205mm;
-                height: 148mm;
-                position: relative;
-                page-break-after: always;
-                overflow: hidden;
-            }
-            .pagina:last-child {
-                page-break-after: auto;
-            }
-            .date {
-                position: absolute;
-                top: 31mm;
-                right: 152mm;
-            }
-            .name {
-                position: absolute;
-                top: 43mm;
-                left: 66mm;
-                font-size: 13.5pt;
-            }
-            .address {
-                position: absolute;
-                top: 49mm;
-                left: 50mm;
-            }
-            .id {
-                position: absolute;
-                top: 54mm;
-                left: 150mm;
-                /* Prueba añadiendo !important para la impresión */
-                /* position: absolute !important;
-                top: 60mm !important;
-                left: 148mm !important; */
-            }
-    
-            .item-container {
-                position: absolute;
-                top: 67mm;
-                left: 18mm;
-                width: 180mm;
-                display: flex;
-                justify-content: space-between;
-            }
-    
-            .item-description {
-                width: 104mm;
-                text-align: left;
-                word-wrap: break-word;
-                overflow-wrap: break-word;
-                white-space: normal;
-                /* background-color: rgba(255,0,0,0.1); /* Solo para visualización */
-            }
-    
-            .item-amount {
-                width: 32mm;
-                text-align: right;
-                display: flex;
-                flex-direction: column;
-                justify-content: flex-end;
-                /* background-color: rgba(0,255,0,0.1); /* Solo para visualización */
-                /* Prueba añadiendo !important para la impresión */
-                /* display: flex !important;
-                flex-direction: column !important;
-                justify-content: flex-end !important; */
-            }
-    
-            .total1 {
-                position: absolute;
-                top: 121mm;
-                right: 20mm;
-                text-align: right;
-            }
-            .dash1 {
-                position: absolute;
-                top: 126mm;
-                right: 20mm;
-                text-align: right;
-            }
-            .dash2 {
-                position: absolute;
-                top: 131mm;
-                right: 20mm;
-                text-align: right;
-            }
-            .final-total {
-                position: absolute;
-                top: 136mm;
-                right: 20mm;
-                text-align: right;
-            }
-            
-            .date2 {
-                position: absolute;
-                top: 48mm;
-                right: 143mm;
-            }
-            
-            .name2 {
-                position: absolute;
-                top: 54mm;
-                left: 55mm;
-                font-size: 13.5pt;
-            }
-            
-            .address2 {
-                position: absolute;
-                top: 59mm;
-                left: 38mm;
-            }
-            
-            .id2 {
-                position: absolute;
-                top: 65mm;
-                left: 157mm;
-                /* Prueba añadiendo !important para la impresión */
-                /* position: absolute !important;
-                top: 60mm !important;
-                left: 148mm !important; */
-            }
-    
-            .item-container2 {
-                position: absolute;
-                top: 78mm;
-                left: 27mm;
-                width: 168mm;
-                display: flex;
-                justify-content: space-between;
-                font-size: 13.5pt;
-            }
-    
-            .item-description2 {
-                width: 104mm;
-                text-align: left;
-                word-wrap: break-word;
-                overflow-wrap: break-word;
-                white-space: normal;
-                /* background-color: rgba(255,0,0,0.1); /* Solo para visualización */
-            }
-    
-            .item-amount2 {
-                width: 28mm;
-                text-align: center;
-                display: flex;
-                flex-direction: column;
-                justify-content: flex-end;
-                /* background-color: rgba(0,255,0,0.1); /* Solo para visualización */
-                /* Prueba añadiendo !important para la impresión */
-                /* display: flex !important;
-                flex-direction: column !important;
-                justify-content: flex-end !important; */
-            }
-    
-            .total12 {
-                position: absolute;
-                top: 120mm;
-                right: 18mm;
-                text-align: right;
-            }
-            .dash12 {
-                position: absolute;
-                top: 128mm;
-                right: 18mm;
-                text-align: right;
-            }
-            .dash22 {
-                position: absolute;
-                top: 135mm;
-                right: 18mm;
-                text-align: right;
-            }
-            .final-total2 {
-                position: absolute;
-                top: 141mm;
-                right: 18mm;
-                text-align: right;
-            }
-    
-    
-            /* Estilos específicos para la impresión (prueba aquí) */
-            @media print {
-                /* Intenta forzar la visualización */
-                .id {
-                    /* position: absolute !important;
-                    top: 60mm !important;
-                    left: 148mm !important; */
-                    color: black !important; /* Asegúrate de que el color no sea blanco o transparente */
-                }
-                .item-amount {
-                    /* display: flex !important;
-                    flex-direction: column !important;
-                    justify-content: flex-end !important; */
-                    color: black !important; /* Asegúrate de que el color no sea blanco o transparente */
-                }
-    
-                /* Prueba con un borde para ver si el elemento está ahí */
-                /* .id { border: 1px solid black !important; }
-                .item-amount { border: 1px solid blue !important; } */
-            }
-        </style>
-    </head>
-    <body>
-         <div class="pagina">
-            <div class="date">{day} &emsp;{month_date} &emsp;{year}</div>
-        
-            <div class="name">{name}</div>
-            <div class="address">{adress}</div>
-            <div class="id">{id}</div>
-        
-            <div class="item-container">
-                <div class="item-description">
-                    CANCELACIÓN DEL 20% POR CUOTA CORRESPONDIENTE A ENERO 2024 CON UN TEXTO MÁS LARGO QUE GENERA SALTO DE LÍNEA
-                </div>
-                <div class="item-amount">
-                    144.00
-                </div>
-            </div>
-        
-            <div class="total1">576.00</div>
-            <div class="dash1">-</div>
-            <div class="dash2">-</div>
-            <div class="final-total">576.00</div>
-        </div>
-    
-        <!-- SEGUNDA PÁGINA (MONTOS ACTUALIZADOS) -->
-        <div class="pagina">
-            <div class="date2">31 &emsp;12 &emsp;2025</div>
-        
-            <div class="name2">MARIO ROMERO</div>
-            <div class="address2">URB EL VALLE</div>
-            <div class="id2">V-127582390</div>
-        
-            <div class="item-container2">
-                <div class="item-description2">
-                    CANCELACIÓN DEL 20% POR CUOTA CORRESPONDIENTE A ENERO 2024 CON UN TEXTO MÁS LARGO QUE GENERA SALTO DE LÍNEA
-                </div>
-                <div class="item-amount2">
-                    144.00
-                </div>
-            </div>
-        
-            <div class="total12">576.00</div>
-            <div class="dash12">-</div>
-            <div class="dash22">-</div>
-            <div class="final-total2">576.00</div>
-        </div>
-    </body>
-    </html>
-    """
-
-
-# Configurar el sistema de impresión
-setup_printing(html_content=html_content)
+# Configurar el sistema de impresió
 

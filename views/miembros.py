@@ -179,34 +179,34 @@ def añadir_miembro():
                                 if None in [row.get('ID_MIEMBRO'), row.get('RAZON_SOCIAL'), row.get('RIF')]:
                                     raise ValueError(f"Campos obligatorios faltantes en fila {i}")
 
-                                # Procesamiento CORRECTO de ULTIMO_MES
-                                ultimo_mes = None
-                                if pd.notna(row.get('ULTIMO_MES')) and str(row.get('ULTIMO_MES')).strip() != '':
-                                    ultimo_mes = str(row.get('ULTIMO_MES')).strip()
-                                    # Opcional: Formatear consistente (ej. mayúsculas)
-                                    ultimo_mes = ultimo_mes.upper() if ultimo_mes else None
-
                                 # Datos para Miembro - Asegurando incluir ULTIMO_MES
                                 miembro_data = {
                                     'ID_MIEMBRO': int(row.get('ID_MIEMBRO')),
                                     'RAZON_SOCIAL': row.get('RAZON_SOCIAL'),
                                     'RIF': row.get('RIF'),
-                                    'ULTIMO_MES': ultimo_mes,  # Ahora sí se incluye correctamente
+                                    'ULTIMO_MES': row.get('ULTIMO_MES'),  # Ahora sí se incluye correctamente
                                     'SALDO': float(row.get('SALDO', 0))
                                 }
+                                
+                                print(f"Miembro data: {miembro_data}")  # Debug adicional
                                 miembros_batch.append(miembro_data)
                                 
-                                # Resto de preparación de datos para info_batch y saldos_batch
-                                # ... (igual que antes)
+                                info_data = {
+                                    'ID_MIEMBRO': int(row.get('ID_MIEMBRO')),
+                                    'NUM_TELEFONO': row.get('NUM_TELEFONO'),
+                                    'REPRESENTANTE': row.get('REPRESENTANTE'),
+                                    'CI_REPRESENTANTE': row.get('CI_REPRESENTANTE'),
+                                    'CORREO': row.get('CORREO'),
+                                    'DIRECCION': row.get('DIRECCION'),
+                                    'HACIENDA': row.get('HACIENDA')
+                                }
+                                info_batch.append(info_data)
+                            
                             
                             # Insertar lote - VERIFICACIÓN ADICIONAL
                             try:
-                                # Debug: Verificar datos antes de insertar
-                                print(f"Lote {i}: ULTIMO_MES a insertar:", [m['ULTIMO_MES'] for m in miembros_batch])
-                                
                                 session.bulk_insert_mappings(Miembro, miembros_batch)
                                 session.bulk_insert_mappings(InformacionMiembro, info_batch)
-                                session.bulk_insert_mappings(Saldo, saldos_batch)
                                 session.commit()
                             except Exception as e:
                                 session.rollback()
@@ -521,7 +521,6 @@ with botones:
             delete = st.button(':material/delete: Eliminar', use_container_width=True, type='primary')
             if delete:
                 st.session_state.ids_a_eliminar = [miembros_base.loc[i, "ID_MIEMBRO"] for i in seleccion]
-                print(st.session_state.ids_a_eliminar)
                 confirmar_eliminacion()
     with col3:
         if len(seleccion) == 1:

@@ -1,108 +1,337 @@
-# app.py - Interfaz Streamlit
-import streamlit as st
-from datetime import datetime
-from .invoice_model import FacturaGenerator
-import base64
+from streamlit.components.v1 import html
+import uuid
+import datetime
 
-# Configuración de la página
-st.set_page_config(
-    page_title="Generador de Facturas Físicas",
-    layout="centered",
-    initial_sidebar_state="expanded"
-)
-
-# Clase para manejar el estado de la UI
-class FacturaUI:
-    @staticmethod
-    def show_header():
-        st.title("🧾 Generador de Facturas")
-        st.markdown("""
-        **Precisión milimétrica para talonarios físicos**  
-        Tamaño configurado: {}mm × {}mm
-        """.format(FacturaGenerator.TALONARIO_WIDTH, FacturaGenerator.TALONARIO_HEIGHT))
-
-    @staticmethod
-    def input_form():
-        with st.form("factura_form"):
-            cols = st.columns(2)
-            with cols[0]:
-                fecha = st.date_input("Fecha", datetime.now())
-                nombre = st.text_input("Nombre del Cliente")
-            with cols[1]:
-                cedula = st.text_input("Cédula/RUC")
-                direccion = st.text_input("Dirección")
-            
-            st.subheader("Detalles de Factura")
-            detalles = []
-            for i in range(2):  # Dos líneas de detalle
-                cols = st.columns([3, 1])
-                detalles.append({
-                    "concepto": cols[0].text_input(f"Concepto {i+1}", key=f"concepto_{i}"),
-                    "monto": cols[1].text_input(f"Monto {i+1}", key=f"monto_{i}")
-                })
-            
-            total = st.text_input("Total")
-            
-            submit = st.form_submit_button("Generar Factura")
-            
-            if submit:
-                return {
-                    "fecha": fecha.strftime("%d/%m/%Y"),
-                    "nombre": nombre,
-                    "direccion": direccion,
-                    "cedula": cedula,
-                    "detalles": [d for d in detalles if d["concepto"]],
-                    "total": total
-                }
-        return None
-
-    @staticmethod
-    def preview_section(pdf_bytes):
-        st.subheader("Vista Previa")
-        base64_pdf = base64.b64encode(pdf_bytes).decode('utf-8')
-        pdf_display = f'<iframe src="data:application/pdf;base64,{base64_pdf}" width="100%" height="500px" type="application/pdf"></iframe>'
-        st.markdown(pdf_display, unsafe_allow_html=True)
+def setup_printing(html_content):
+    iframe_id = f"print-frame-{uuid.uuid4()}"
+    
+    js = f"""
+    <script>
+    function prepareAndPrint() {{
+        // Crear iframe oculto
+        var iframe = document.createElement('iframe');
+        iframe.id = '{iframe_id}';
+        iframe.style.position = 'fixed';
+        iframe.style.right = '0';
+        iframe.style.bottom = '0';
+        iframe.style.width = '0';
+        iframe.style.height = '0';
+        iframe.style.border = 'none';
+        document.body.appendChild(iframe);
         
-        st.download_button(
-            label="Descargar PDF",
-            data=pdf_bytes,
-            file_name="factura.pdf",
-            mime="application/pdf"
-        )
-
-    @staticmethod
-    def print_section(pdf_bytes):
-        st.subheader("Impresión Directa")
-        if st.button("🖨 Enviar a Impresora"):
-            js = f"""
-            <script>
-            function printPDF() {{
-                const blob = new Blob([{list(pdf_bytes)}], {{type: 'application/pdf'}});
-                const url = URL.createObjectURL(blob);
-                const iframe = document.createElement('iframe');
-                iframe.style.display = 'none';
-                iframe.src = url;
-                document.body.appendChild(iframe);
-                iframe.onload = () => {{
-                    setTimeout(() => {{
-                        iframe.contentWindow.print();
-                        URL.revokeObjectURL(url);
-                    }}, 1000);
-                }};
-            }}
-            printPDF();
-            </script>
-            """
-            st.components.v1.html(js, height=0, width=0)
-            st.success("Enviando a impresora... Verifica la primera copia")
-
-# Flujo principal
-def main():
-    FacturaUI.show_header()
+        // Insertar contenido
+        var iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+        iframeDoc.open();
+        iframeDoc.write(`{html_content}`);
+        iframeDoc.close();
+        
+        // Esperar a que el contenido se cargue y luego imprimir
+        iframe.onload = function() {{
+            setTimeout(function() {{
+                iframe.contentWindow.focus();
+                iframe.contentWindow.print();
+            }}, 200); // Pequeño retraso para asegurar la carga
+        }};
+    }}
     
-    data = FacturaUI.input_form()
-    
-    if data:
-        pdf_bytes = FacturaGenerator.generar_pdf(data)
-        FacturaUI.preview_section(pdf_bytes)
-        FacturaUI.print_section(pdf_bytes)
+    // Ejecutar automáticamente al cargar la página
+    window.addEventListener('load', prepareAndPrint);
+    </script>
+    """
+    html(js)
+
+
+def invoice_model(date: datetime, name: str, adress: str, id: str, month: str, monto: float):
+    day = date.day
+    month_date = date.month
+    year = date.year
+    monto_ugavi = monto * 0.6
+    monto_fondo = monto * 0.2
+    total1 = monto_ugavi + monto_fondo
+    html_content = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <style>
+                @page {{
+                    size: 205mm 148mm;
+                    margin: 0;
+                    padding: 0;
+                }}
+                body {{
+                    width: 205mm;
+                    margin: 0;
+                    padding: 0;
+                    padding: 4mm;
+                    font-family: Arial;
+                    font-size: 12.5pt;
+                    position: relative;
+                }}
+                .pagina {{
+                    width: 205mm;
+                    height: 148mm;
+                    position: relative;
+                    page-break-after: always;
+                    overflow: hidden;
+                }}
+                .pagina:last-child {{
+                    page-break-after: auto;
+                }}
+                .date {{
+                    position: absolute;
+                    top: 31mm;
+                    right: 152mm;
+                }}
+                .name {{
+                    position: absolute;
+                    top: 43mm;
+                    left: 66mm;
+                    font-size: 13.5pt;
+                }}
+                .address {{
+                    position: absolute;
+                    top: 49mm;
+                    left: 50mm;
+                }}
+                .id {{
+                    position: absolute;
+                    top: 54mm;
+                    left: 150mm;
+                    /* Prueba añadiendo !important para la impresión */
+                    /* position: absolute !important;
+                    top: 60mm !important;
+                    left: 148mm !important; */
+                }}
+        
+                .items-wrapper {{
+                    position: absolute;
+                    top: 67mm;
+                    left: 18mm;
+                    width: 180mm;
+                    display: flex;
+                    flex-direction: column;  /* Apila los elementos verticalmente */
+                    gap: 8mm;  /* Espacio entre elementos */
+                }}
+                
+                .item-container {{
+                    display: flex;
+                    justify-content: space-between;
+                    width: 100%;
+                }}
+        
+                .item-description {{
+                    width: 104mm;
+                    text-align: left;
+                    word-wrap: break-word;
+                    overflow-wrap: break-word;
+                    white-space: normal;
+                    /* background-color: rgba(255,0,0,0.1); /* Solo para visualización */
+                }}
+        
+                .item-amount {{
+                    width: 32mm;
+                    text-align: right;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: flex-end;
+                    /* background-color: rgba(0,255,0,0.1); /* Solo para visualización */
+                    /* Prueba añadiendo !important para la impresión */
+                    /* display: flex !important;
+                    flex-direction: column !important;
+                    justify-content: flex-end !important; */
+                }}
+        
+                .total1 {{
+                    position: absolute;
+                    top: 121mm;
+                    right: 20mm;
+                    text-align: right;
+                }}
+                .dash1 {{
+                    position: absolute;
+                    top: 126mm;
+                    right: 20mm;
+                    text-align: right;
+                }}
+                .dash2 {{
+                    position: absolute;
+                    top: 131mm;
+                    right: 20mm;
+                    text-align: right;
+                }}
+                .final-total {{
+                    position: absolute;
+                    top: 136mm;
+                    right: 20mm;
+                    text-align: right;
+                }}
+                
+                .date2 {{
+                    position: absolute;
+                    top: 48mm;
+                    right: 143mm;
+                }}
+                
+                .name2 {{
+                    position: absolute;
+                    top: 54mm;
+                    left: 55mm;
+                    font-size: 13.5pt;
+                }}
+                
+                .address2 {{
+                    position: absolute;
+                    top: 59mm;
+                    left: 38mm;
+                }}
+                
+                .id2 {{
+                    position: absolute;
+                    top: 65mm;
+                    left: 157mm;
+                    /* Prueba añadiendo !important para la impresión */
+                    /* position: absolute !important;
+                    top: 60mm !important;
+                    left: 148mm !important; */
+                }}
+        
+                .item-container2 {{
+                    position: absolute;
+                    top: 78mm;
+                    left: 27mm;
+                    width: 168mm;
+                    display: flex;
+                    justify-content: space-between;
+                    font-size: 13.5pt;
+                }}
+        
+                .item-description2 {{
+                    width: 104mm;
+                    text-align: left;
+                    word-wrap: break-word;
+                    overflow-wrap: break-word;
+                    white-space: normal;
+                    /* background-color: rgba(255,0,0,0.1); /* Solo para visualización */
+                }}
+        
+                .item-amount2 {{
+                    width: 28mm;
+                    text-align: center;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: flex-end;
+                    /* background-color: rgba(0,255,0,0.1); /* Solo para visualización */
+                    /* Prueba añadiendo !important para la impresión */
+                    /* display: flex !important;
+                    flex-direction: column !important;
+                    justify-content: flex-end !important; */
+                }}
+        
+                .total12 {{
+                    position: absolute;
+                    top: 120mm;
+                    right: 18mm;
+                    text-align: right;
+                }}
+                .dash12 {{
+                    position: absolute;
+                    top: 128mm;
+                    right: 18mm;
+                    text-align: right;
+                }}
+                .dash22 {{
+                    position: absolute;
+                    top: 135mm;
+                    right: 18mm;
+                    text-align: right;
+                }}
+                .final-total2 {{
+                    position: absolute;
+                    top: 141mm;
+                    right: 18mm;
+                    text-align: right;
+                }}
+        
+        
+                /* Estilos específicos para la impresión (prueba aquí) */
+                @media print {{
+                    /* Intenta forzar la visualización */
+                    .id {{
+                        /* position: absolute !important;
+                        top: 60mm !important;
+                        left: 148mm !important; */
+                        color: black !important; /* Asegúrate de que el color no sea blanco o transparente */
+                    }}
+                    .item-amount {{
+                        /* display: flex !important;
+                        flex-direction: column !important;
+                        justify-content: flex-end !important; */
+                        color: black !important; /* Asegúrate de que el color no sea blanco o transparente */
+                    }}
+        
+                    /* Prueba con un borde para ver si el elemento está ahí */
+                    /* .id {{ border: 1px solid black !important; }}
+                    .item-amount {{ border: 1px solid blue !important; }} */
+                }}
+            </style>
+        </head>
+        <body>
+            <div class="pagina">
+                <div class="date">{day} &emsp;{month_date} &emsp;{year}</div>
+            
+                <div class="name">{name}</div>
+                <div class="address">{adress}</div>
+                <div class="id">{id}</div>
+
+                <div class="items-wrapper">
+                    <div class="item-container">
+                        <div class="item-description">
+                            CANCELACIÓN DEL 60% POR CUOTA CORRESPONDIENTE A {month}
+                        </div>
+                        <div class="item-amount">
+                            {monto_ugavi:.2f}
+                        </div>
+                    </div>
+                    <div class="item-container">
+                        <div class="item-description">
+                            CANCELACIÓN DEL 20% POR CUOTA CORRESPONDIENTE A {month}
+                        </div>
+                        <div class="item-amount">
+                            {monto_fondo:.2f}
+                        </div>
+                    </div>
+                </div>
+            
+                <div class="total1">{total1:.2f}</div>
+                <div class="dash1">-</div>
+                <div class="dash2">-</div>
+                <div class="final-total">{total1:.2f}</div>
+            </div>
+        
+            <!-- SEGUNDA PÁGINA (MONTOS ACTUALIZADOS) -->
+            <div class="pagina">
+                <div class="date2">{day} &emsp;{month_date} &emsp;{year}</div>
+            
+                <div class="name2">{name}</div>
+                <div class="address2">{adress}</div>
+                <div class="id2">{id}</div>
+            
+                <div class="item-container2">
+                    <div class="item-description2">
+                        CANCELACIÓN DEL 20% POR CUOTA CORRESPONDIENTE A {month}
+                    </div>
+                    <div class="item-amount2">
+                        {monto_fondo:.2f}
+                    </div>
+                </div>
+            
+                <div class="total12">{monto_fondo:.2f}</div>
+                <div class="dash12">-</div>
+                <div class="dash22">-</div>
+                <div class="final-total2">{monto_fondo:.2f}</div>
+            </div>
+        </body>
+        </html>
+        """
+    return html_content
+
