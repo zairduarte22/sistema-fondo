@@ -310,7 +310,7 @@ def invoice_model(date: datetime, name: str, adress: str, id: str, month: str, m
         
             <!-- SEGUNDA PÁGINA (MONTOS ACTUALIZADOS) -->
             <div class="pagina">
-                <div class="date2">{day}&emsp&emsp;{month_date} &emsp;{year}</div>
+                <div class="date2">{day}&emsp;&emsp;{month_date} &emsp;{year}</div>
             
                 <div class="name2">{name}</div>
                 <div class="address2">{adress}</div>
