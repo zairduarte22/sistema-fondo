@@ -21,8 +21,8 @@ if 'selected_movimiento' not in st.session_state:
 
 
 # Obtener los datos de la tabla CONCILIACION_BS
-movimientos = obtener_df(ConciliacionBS)
-
+movimientos_df = obtener_df(ConciliacionBS)
+movimientos = movimientos_df.sort_values(by='FECHA', ascending=False)
 # Obtener los datos de la tabla Miembro
 miembros = obtener_df(Miembro)
 
@@ -196,7 +196,6 @@ with tabla:
         movimientos_df = st.dataframe(
             movimientos_filtrado,
             use_container_width=True,
-            sorted_by="FECHA",
             hide_index=True,
             column_config=conf_col,
             on_select='rerun',
