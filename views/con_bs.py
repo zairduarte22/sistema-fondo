@@ -82,7 +82,7 @@ def editar_movimiento():
     with col13:
         fecha = st.date_input('Fecha', value=movimiento['FECHA'], disabled=st.session_state.edit)
         cuenta_contable = st.text_input('Cuenta Contable', value=movimiento['CUENTA_CONTABLE'], disabled=st.session_state.edit)
-        tipo_operacion = st.selectbox('Tipo de Operación',['TRANSF', 'COM'] , index=movimiento['TIPO_OPERACION'], disabled=st.session_state.edit)
+        tipo_operacion = st.selectbox('Tipo de Operación',['TRANSF', 'COM'] , index=['TRANSF', 'COM'].index(movimiento['TIPO_OPERACION']), disabled=st.session_state.edit)
         referencia = st.text_input('Referencia', value=movimiento['REFERENCIA'], disabled=st.session_state.edit)
     with col14:
         beneficiario = st.text_input('Beneficiario', value=movimiento['BENEFICIARIO'], disabled=st.session_state.edit)
