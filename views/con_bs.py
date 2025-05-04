@@ -208,7 +208,7 @@ with botones:
     col1, col2, col3 = st.columns([1, 1, 4])
     with col1:
         if len(seleccion) >= 1:
-            delete_movimiento = st.button(':material/delete: Eliminar Movimiento', type='primary')
+            delete_movimiento = st.button(':material/delete: Eliminar', type='primary')
             if delete_movimiento and seleccion:
                 st.session_state.selected_movimiento = movimientos.iloc[seleccion].to_dict('records')
                 eliminar_movimiento()
