@@ -22,21 +22,10 @@ if 'selected_movimiento' not in st.session_state:
 
 # Obtener los datos de la tabla CONCILIACION_BS
 movimientos = obtener_df(ConciliacionBS)
-st.error = st.dataframe(movimientos)
 
 # Obtener los datos de la tabla Miembro
 miembros = obtener_df(Miembro)
 
-# Reemplazar el valor de 'BENEFICIARIO' si 'CUENTA_CONTABLE' es "Ingreso por cuotas"
-if "Ingresos por Cuotas" in movimientos['CUENTA_CONTABLE'].values:
-    # Convertir 'BENEFICIARIO' a entero para que coincida con 'ID_MIEMBRO'
-    movimientos['BENEFICIARIO'] = movimientos['BENEFICIARIO'].astype(str)
-
-    # Crear un diccionario para mapear ID_MIEMBRO a RAZON_SOCIAL
-    id_to_razon_social = dict(zip(miembros['ID_MIEMBRO'].astype(str), miembros['RAZON_SOCIAL']))
-
-    # Reemplazar 'BENEFICIARIO' con 'RAZON_SOCIAL' donde 'CUENTA_CONTABLE' es "Ingreso por cuotas"
-    movimientos.loc[movimientos['CUENTA_CONTABLE'] == "Ingresos por Cuotas", 'BENEFICIARIO'] = movimientos['BENEFICIARIO'].map(id_to_razon_social)
 
 @st.dialog("Registro de Movimiento", width="large")
 def agregar_movimiento():
