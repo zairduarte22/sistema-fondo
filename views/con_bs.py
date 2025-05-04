@@ -120,6 +120,8 @@ def editar_movimiento():
                 "INGRESO": ingreso,
                 "EGRESO": egreso
             }
+            
+            print(beneficiario)
 
             # Actualizar movimiento
             try:
