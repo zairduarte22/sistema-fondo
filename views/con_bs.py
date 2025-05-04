@@ -120,13 +120,18 @@ def editar_movimiento():
                 "INGRESO": ingreso,
                 "EGRESO": egreso
             }
-            
-            print(beneficiario)
 
             # Actualizar movimiento
             try:
                 session.query(ConciliacionBS).filter(ConciliacionBS.ID_MOVIMIENTO == movimiento['ID_MOVIMIENTO']).update(campos_valores_movimiento)
                 session.commit()
+
+                # Refetch the updated record to ensure correct mapping
+                updated_movimiento = session.query(ConciliacionBS).filter(ConciliacionBS.ID_MOVIMIENTO == movimiento['ID_MOVIMIENTO']).first()
+                if updated_movimiento and updated_movimiento.CUENTA_CONTABLE == "Ingresos por Cuotas":
+                    # Map BENEFICIARIO to RAZON_SOCIAL if applicable
+                    updated_movimiento.BENEFICIARIO = id_to_razon_social.get(str(updated_movimiento.BENEFICIARIO), updated_movimiento.BENEFICIARIO)
+
                 st.session_state.notificacion = 'Movimiento actualizado exitosamente'
                 st.rerun()
             except Exception as e:
