@@ -135,15 +135,15 @@ def editar_movimiento():
 @st.dialog("Eliminar Movimiento", width="large")
 def eliminar_movimiento():
     st.warning('¿Estás seguro de que quieres eliminar los siguientes movimientos?')
-    for index in st.session_state.selected_movimiento:
-        st.write(f'ID Movimiento: {movimientos.loc[index, "ID_MOVIMIENTO"]}')
+    for movimiento in st.session_state.selected_movimiento:
+        st.write(f'ID Movimiento: {movimiento["ID_MOVIMIENTO"]}')
 
     col0, col1, col2, col3 = st.columns([2, 1.3, 1.3, 2], gap='medium')
     with col0:
         if st.button('Confirmar', use_container_width=True):
-            for index in st.session_state.selected_movimiento:
+            for movimiento in st.session_state.selected_movimiento:
                 try:
-                    session.query(ConciliacionBS).filter(ConciliacionBS.ID_MOVIMIENTO == movimientos.loc[index, "ID_MOVIMIENTO"]).delete()
+                    session.query(ConciliacionBS).filter(ConciliacionBS.ID_MOVIMIENTO == movimiento["ID_MOVIMIENTO"]).delete()
                     session.commit()
                 except Exception as e:
                     session.rollback()
@@ -219,13 +219,13 @@ with botones:
         if len(seleccion) >= 1:
             delete_movimiento = st.button(':material/delete: Eliminar Movimiento', type='primary')
             if delete_movimiento and seleccion:
-                st.session_state.selected_movimiento = seleccion
+                st.session_state.selected_movimiento = movimientos.iloc[seleccion].to_dict('records')
                 eliminar_movimiento()
     with col2:
         if len(seleccion) == 1:
             edit_movimiento = st.button(':material/edit: Ver/Editar', type='primary')
             if edit_movimiento and seleccion:
-                st.session_state.selected_movimiento = movimientos.loc[seleccion[0]].to_dict()
+                st.session_state.selected_movimiento = movimientos.iloc[seleccion[0]].to_dict()
                 editar_movimiento()
 
 
