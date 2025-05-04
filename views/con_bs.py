@@ -196,6 +196,7 @@ with tabla:
         movimientos_df = st.dataframe(
             movimientos_filtrado,
             use_container_width=True,
+            sorted_by="FECHA",
             hide_index=True,
             column_config=conf_col,
             on_select='rerun',
