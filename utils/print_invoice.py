@@ -79,23 +79,23 @@ def invoice_model(date: datetime, name: str, adress: str, id: str, month: str, m
                 }}
                 .date {{
                     position: absolute;
-                    top: 33mm;
+                    top: 35mm;
                     right: 154mm;
                 }}
                 .name {{
                     position: absolute;
-                    top: 39mm;
+                    top: 41mm;
                     left: 66mm;
                     font-size: 13.5pt;
                 }}
                 .address {{
                     position: absolute;
-                    top: 45mm;
+                    top: 49mm;
                     left: 50mm;
                 }}
                 .id {{
                     position: absolute;
-                    top: 50mm;
+                    top: 53mm;
                     left: 150mm;
                     /* Prueba añadiendo !important para la impresión */
                     /* position: absolute !important;
@@ -105,7 +105,7 @@ def invoice_model(date: datetime, name: str, adress: str, id: str, month: str, m
         
                 .items-wrapper {{
                     position: absolute;
-                    top: 62mm;
+                    top: 66mm;
                     left: 18mm;
                     width: 180mm;
                     display: flex;
@@ -143,25 +143,25 @@ def invoice_model(date: datetime, name: str, adress: str, id: str, month: str, m
         
                 .total1 {{
                     position: absolute;
-                    top: 118mm;
+                    top: 121mm;
                     right: 20mm;
                     text-align: right;
                 }}
                 .dash1 {{
                     position: absolute;
-                    top: 123mm;
+                    top: 126mm;
                     right: 20mm;
                     text-align: right;
                 }}
                 .dash2 {{
                     position: absolute;
-                    top: 128mm;
+                    top: 131mm;
                     right: 20mm;
                     text-align: right;
                 }}
                 .final-total {{
                     position: absolute;
-                    top: 133mm;
+                    top: 136mm;
                     right: 20mm;
                     text-align: right;
                 }}
