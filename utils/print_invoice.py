@@ -169,26 +169,26 @@ def invoice_model(date: datetime, name: str, adress: str, id: str, month: str, m
                 .date2 {{
                     position: absolute;
                     top: 48mm;
-                    right: 143mm;
+                    right: 140mm;
                 }}
                 
                 .name2 {{
                     position: absolute;
                     top: 54mm;
-                    left: 55mm;
+                    left: 58mm;
                     font-size: 13.5pt;
                 }}
                 
                 .address2 {{
                     position: absolute;
                     top: 59mm;
-                    left: 38mm;
+                    left: 41mm;
                 }}
                 
                 .id2 {{
                     position: absolute;
                     top: 65mm;
-                    left: 157mm;
+                    left: 160mm;
                     /* Prueba añadiendo !important para la impresión */
                     /* position: absolute !important;
                     top: 60mm !important;
@@ -198,7 +198,7 @@ def invoice_model(date: datetime, name: str, adress: str, id: str, month: str, m
                 .item-container2 {{
                     position: absolute;
                     top: 78mm;
-                    left: 27mm;
+                    left: 30mm;
                     width: 168mm;
                     display: flex;
                     justify-content: space-between;
@@ -230,25 +230,25 @@ def invoice_model(date: datetime, name: str, adress: str, id: str, month: str, m
                 .total12 {{
                     position: absolute;
                     top: 120mm;
-                    right: 18mm;
+                    right: 21mm;
                     text-align: right;
                 }}
                 .dash12 {{
                     position: absolute;
                     top: 128mm;
-                    right: 18mm;
+                    right: 21mm;
                     text-align: right;
                 }}
                 .dash22 {{
                     position: absolute;
                     top: 135mm;
-                    right: 18mm;
+                    right: 21mm;
                     text-align: right;
                 }}
                 .final-total2 {{
                     position: absolute;
                     top: 141mm;
-                    right: 18mm;
+                    right: 21mm;
                     text-align: right;
                 }}
         
