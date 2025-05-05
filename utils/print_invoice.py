@@ -79,23 +79,23 @@ def invoice_model(date: datetime, name: str, adress: str, id: str, month: str, m
                 }}
                 .date {{
                     position: absolute;
-                    top: 35mm;
+                    top: 33mm;
                     right: 154mm;
                 }}
                 .name {{
                     position: absolute;
-                    top: 43mm;
+                    top: 39mm;
                     left: 66mm;
                     font-size: 13.5pt;
                 }}
                 .address {{
                     position: absolute;
-                    top: 49mm;
+                    top: 45mm;
                     left: 50mm;
                 }}
                 .id {{
                     position: absolute;
-                    top: 53mm;
+                    top: 50mm;
                     left: 150mm;
                     /* Prueba añadiendo !important para la impresión */
                     /* position: absolute !important;
@@ -105,7 +105,7 @@ def invoice_model(date: datetime, name: str, adress: str, id: str, month: str, m
         
                 .items-wrapper {{
                     position: absolute;
-                    top: 66mm;
+                    top: 62mm;
                     left: 18mm;
                     width: 180mm;
                     display: flex;
@@ -143,25 +143,25 @@ def invoice_model(date: datetime, name: str, adress: str, id: str, month: str, m
         
                 .total1 {{
                     position: absolute;
-                    top: 121mm;
+                    top: 118mm;
                     right: 20mm;
                     text-align: right;
                 }}
                 .dash1 {{
                     position: absolute;
-                    top: 126mm;
+                    top: 123mm;
                     right: 20mm;
                     text-align: right;
                 }}
                 .dash2 {{
                     position: absolute;
-                    top: 131mm;
+                    top: 128mm;
                     right: 20mm;
                     text-align: right;
                 }}
                 .final-total {{
                     position: absolute;
-                    top: 136mm;
+                    top: 133mm;
                     right: 20mm;
                     text-align: right;
                 }}
@@ -230,7 +230,7 @@ def invoice_model(date: datetime, name: str, adress: str, id: str, month: str, m
                 .total12 {{
                     position: absolute;
                     top: 120mm;
-                    right: 21mm;
+                    right: 18mm;
                     text-align: right;
                 }}
                 .dash12 {{
@@ -248,7 +248,7 @@ def invoice_model(date: datetime, name: str, adress: str, id: str, month: str, m
                 .final-total2 {{
                     position: absolute;
                     top: 141mm;
-                    right: 21mm;
+                    right: 18mm;
                     text-align: right;
                 }}
         
@@ -310,7 +310,7 @@ def invoice_model(date: datetime, name: str, adress: str, id: str, month: str, m
         
             <!-- SEGUNDA PÁGINA (MONTOS ACTUALIZADOS) -->
             <div class="pagina">
-                <div class="date2">{day}&emsp;&emsp;{month_date} &emsp;{year}</div>
+                <div class="date2">{day} &emsp;&emsp;{month_date} &emsp;{year}</div>
             
                 <div class="name2">{name}</div>
                 <div class="address2">{adress}</div>
