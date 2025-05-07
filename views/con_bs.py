@@ -1,7 +1,6 @@
 import streamlit as st
-from db.conexion import session, FactCuota, Miembro, InformacionMiembro, obtener_df, obtener_df_join, ConciliacionBS
+from db.conexion import session, Miembro, obtener_df, ConciliacionBS
 from datetime import date, datetime
-from utils.bcv_tasa import tasa_bs
 
 if 'edit' not in st.session_state:
     st.session_state.edit = True
@@ -33,7 +32,7 @@ def agregar_movimiento():
     col13, col14 = st.columns(2)
 
     with col13:
-        fecha = st.date_input('Fecha', value=date.today())
+        fecha = st.date_input('Fecha', value=date.today(), format='DD/MM/YYYY')
         cuenta_contable = st.text_input('Cuenta Contable')
         tipo_operacion = st.selectbox('Tipo de Operación', ['TRANSF', 'COM'])
         referencia = st.text_input('Referencia')
