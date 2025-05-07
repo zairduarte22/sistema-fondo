@@ -411,7 +411,7 @@ with tabla:
         # Filtrar las columnas a mostrar
         facturas_filtrado = facturas_completo[[
             "FECHA", "ID_MIEMBRO", "MONTO_BS", "MONTO_DIVISAS", "METODO_PAGO", "MENSUALIDADES","FACT_UGAVI","FACT_FONDO", "ESTADO"
-        ]]
+        ]].sort_values(by='FACT_FONDO', ascending=False)
 
         # Configuración de las columnas
         conf_col = {
