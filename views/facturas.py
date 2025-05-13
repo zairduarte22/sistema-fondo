@@ -408,10 +408,11 @@ with tabla:
                 (facturas_completo['FECHA'] >= fecha_inicio) & (facturas_completo['FECHA'] <= fecha_fin)
             ]
 
+        sorted_facturas = facturas_completo.sort_values(by='FECHA', ascending=False)
         # Filtrar las columnas a mostrar
-        facturas_filtrado = facturas_completo[[
+        facturas_filtrado = sorted_facturas[[
             "FECHA", "ID_MIEMBRO", "MONTO_BS", "MONTO_DIVISAS", "METODO_PAGO", "MENSUALIDADES","FACT_UGAVI","FACT_FONDO", "ESTADO"
-        ]].sort_values(by='FACT_FONDO', ascending=False)
+        ]]
 
         # Configuración de las columnas
         conf_col = {
@@ -445,13 +446,13 @@ with botones:
             if len(seleccion) >= 1:
                 delete_factura = st.button(':material/delete: Eliminar Factura', type='primary')
                 if delete_factura and seleccion:
-                    st.session_state.selected_factura = facturas_filtrado.iloc[(seleccion)].to_dict()
+                    st.session_state.selected_factura = sorted_facturas.iloc[(seleccion)].to_dict()
                     eliminar_factura()
     with col2:
         if len(seleccion) == 1:
             edit_factura = st.button(':material/edit: Ver/Editar', type='primary')
             if edit_factura and seleccion:
-                st.session_state.selected_factura = facturas_filtrado.iloc[(seleccion[0])].to_dict()
+                st.session_state.selected_factura = sorted_facturas.iloc[(seleccion[0])].to_dict()
                 print(seleccion[0])
                 print(facturas_completo.iloc[seleccion[0]])
                 print(st.session_state.selected_factura)
@@ -460,7 +461,7 @@ with botones:
         if len(seleccion) == 1:
             generar_factura = st.button(':material/receipt: Generar Factura', type='primary')
             if generar_factura and seleccion:
-                factura_seleccionada = facturas_completo.iloc[seleccion[0]].to_dict()
+                factura_seleccionada = sorted_facturas.iloc[seleccion[0]].to_dict()
                 pdf_file = generar_factura_pdf(factura_seleccionada, miembros_completo)
                 st.download_button(
                     label="Descargar Factura",
