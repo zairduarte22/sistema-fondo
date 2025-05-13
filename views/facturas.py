@@ -445,13 +445,13 @@ with botones:
             if len(seleccion) >= 1:
                 delete_factura = st.button(':material/delete: Eliminar Factura', type='primary')
                 if delete_factura and seleccion:
-                    st.session_state.selected_factura = facturas_completo.iloc[(seleccion)].to_dict()
+                    st.session_state.selected_factura = facturas_filtrado.iloc[(seleccion)].to_dict()
                     eliminar_factura()
     with col2:
         if len(seleccion) == 1:
             edit_factura = st.button(':material/edit: Ver/Editar', type='primary')
             if edit_factura and seleccion:
-                st.session_state.selected_factura = facturas_completo.iloc[(seleccion[0])].to_dict()
+                st.session_state.selected_factura = facturas_filtrado.iloc[(seleccion[0])].to_dict()
                 print(seleccion[0])
                 print(facturas_completo.iloc[seleccion[0]])
                 print(st.session_state.selected_factura)
