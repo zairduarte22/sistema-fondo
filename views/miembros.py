@@ -461,7 +461,7 @@ with header:
         if cobrar:
             cobranza(miembros_completo)
     with col5:
-        pdf_buffer = generar_informe_pdf_miembros(miembros_completo)
+        pdf_buffer = generar_informe_pdf_miembros(miembros_completo, "ESTADO")
         st.download_button(
             label=":material/download: Informe",
             data=pdf_buffer,
