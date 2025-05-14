@@ -3,10 +3,16 @@ from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, Image
 from reportlab.lib.units import inch
+from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.pdfbase import pdfmetrics
 import io
 import pandas as pd
 
-def generar_informe_pdf_miembros(miembros_completo):
+
+def generar_informe_pdf_miembros(miembros_completo, grupo: str):
+    miembros_completo.groupby(grupo)
+    pdfmetrics.registerFont(TTFont("Lato Bold", "assets/fonts/Lato/Lato-Bold.ttf"))
+    pdfmetrics.registerFont(TTFont("Lato Regular", "assets/fonts/Lato/Lato-Regular.ttf"))
     # Crear un buffer para el PDF
     buffer = io.BytesIO()
     # Configurar la página en orientación horizontal (landscape) con márgenes pequeños
@@ -26,31 +32,28 @@ def generar_informe_pdf_miembros(miembros_completo):
     elements = []
 
     # Título
-    elements.append(Paragraph("Informe de Miembros", title_style))
+    elements.append(Paragraph("Reporte de Miembros", title_style))
     elements.append(Spacer(1, 12))
 
     # Tabla de datos
-    data = [["ID", "Razón Social", "Representante", "RIF", "Mensualidad", "Saldo", "Estado"]] + [
+    data = [["ID", "Razón Social", "Representante", "Estado"]] + [
         [
             row["ID_MIEMBRO"],
             row["RAZON_SOCIAL"],
             row["REPRESENTANTE"],
-            row["RIF"],
-            row["ULTIMO_MES"],
-            f"$ {row['SALDO']:.2f}",
             row["ESTADO"]
         ]
         for _, row in miembros_completo.iterrows()
     ]
 
-    table = Table(data, colWidths=[50, 150, 150, 100, 100, 100, 100])  # Ajustar el ancho de las columnas
+    table = Table(data, emptyTableAction='indicate')  # Ajustar el ancho de las columnas
     table.setStyle(TableStyle([
         ("BACKGROUND", (0, 0), (-1, 0), colors.darkgreen),  # Fondo verde oscuro para encabezados
         ("TEXTCOLOR", (0, 0), (-1, 0), colors.whitesmoke),  # Texto blanco en encabezados
         ("ALIGN", (0, 0), (-1, -1), "CENTER"),  # Centrar texto
-        ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),  # Fuente en negrita para encabezados
+        ("FONTNAME", (0, 0), (-1, 0), "Lato Bold"),  # Fuente en negrita para encabezados
         ("BOTTOMPADDING", (0, 0), (-1, 0), 12),  # Espaciado inferior en encabezados
-        ("GRID", (0, 0), (-1, -1), 1, colors.black),  # Bordes negros
+        ("GRID", (0, 0), (-1, -1), 1, colors.black), # Bordes negros
     ]))
     elements.append(table)
 
