@@ -18,7 +18,7 @@ def generar_informe_pdf_miembros(miembros_completo, grupos: list):
     # Configurar la página en orientación horizontal (landscape) con márgenes pequeños
     doc = SimpleDocTemplate(
         buffer,
-        pagesize=landscape(letter),  # Página horizontal
+        pagesize=letter,  # Página horizontal
         rightMargin=20, leftMargin=20, topMargin=20, bottomMargin=20  # Márgenes pequeños
     )
 
