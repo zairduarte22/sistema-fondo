@@ -8,6 +8,7 @@ from utils.bcv_tasa import tasa_bs
 import numpy as np
 from utils.informes_pdf import generar_informe_pdf_miembros, model_member_add_csv
 import time
+import datetime
 
 tasa = tasa_bs()
 
@@ -498,7 +499,7 @@ with header:
         st.download_button(
             label=":material/download: Informe",
             data=pdf_buffer,
-            file_name="informe_miembros.pdf",
+            file_name=f"informe_miembros {datetime.date.today}.pdf",
             mime="application/pdf"
         )
 
