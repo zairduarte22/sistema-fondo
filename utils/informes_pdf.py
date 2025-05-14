@@ -36,15 +36,14 @@ def generar_informe_pdf_miembros(miembros_completo, grupos: list):
     elements.append(Spacer(1, 12))
 
     # Tabla de datos
-    data = [["#", "ID", "Razón Social", "Representante", "Estado"]] + [
+    data = [["ID", "Razón Social", "Representante", "Estado"]] + [
         [
-            idx + 1,
             row["ID_MIEMBRO"],
             row["RAZON_SOCIAL"],
             row["REPRESENTANTE"],
             row["ESTADO"]
         ]
-        for idx, (_, row) in miembros_completo.iterrows()
+        for _, row in miembros_completo.iterrows()
     ]
 
     table = Table(data, emptyTableAction='indicate')  # Ajustar el ancho de las columnas
