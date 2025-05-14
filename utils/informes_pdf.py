@@ -10,7 +10,7 @@ import pandas as pd
 
 
 def generar_informe_pdf_miembros(miembros_completo, grupo: str):
-    miembros_completo.groupby(grupo)
+    miembros_completo.sort_values(grupo, 'SALDO', ascending=False)
     pdfmetrics.registerFont(TTFont("Lato Bold", "assets/fonts/Lato/Lato-Bold.ttf"))
     pdfmetrics.registerFont(TTFont("Lato Regular", "assets/fonts/Lato/Lato-Regular.ttf"))
     # Crear un buffer para el PDF
@@ -36,14 +36,15 @@ def generar_informe_pdf_miembros(miembros_completo, grupo: str):
     elements.append(Spacer(1, 12))
 
     # Tabla de datos
-    data = [["ID", "Razón Social", "Representante", "Estado"]] + [
+    data = [["#", "ID", "Razón Social", "Representante", "Estado"]] + [
         [
+            idx + 1,
             row["ID_MIEMBRO"],
             row["RAZON_SOCIAL"],
             row["REPRESENTANTE"],
             row["ESTADO"]
         ]
-        for _, row in miembros_completo.iterrows()
+        for idx, (_, row) in miembros_completo.iterrows()
     ]
 
     table = Table(data, emptyTableAction='indicate')  # Ajustar el ancho de las columnas
