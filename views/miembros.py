@@ -499,7 +499,7 @@ with header:
         st.download_button(
             label=":material/download: Informe",
             data=pdf_buffer,
-            file_name=f"informe_miembros {datetime.date.today}.pdf",
+            file_name=f"informe_miembros {datetime.date.today()}.pdf",
             mime="application/pdf"
         )
 
