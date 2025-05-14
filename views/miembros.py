@@ -226,29 +226,62 @@ def añadir_miembro():
                             batch = existentes[i:i + batch_size]
                             
                             for _, row in batch.iterrows():
-                                # Actualizar miembro existente
-                                miembro = session.query(Miembro).get(int(row['ID_MIEMBRO']))
-                                if miembro:
-                                    if row['RAZON_SOCIAL']: miembro.RAZON_SOCIAL = row['RAZON_SOCIAL']
-                                    if row['RIF']: miembro.RIF = row['RIF']
-                                    if row['ULTIMO_MES']: miembro.ULTIMO_MES = row['ULTIMO_MES']
-                                    if row['SALDO'] is not None: miembro.SALDO = float(row['SALDO'])
+                                # Verificar solo campo obligatorio
+                                if row.get('ID_MIEMBRO') is None:
+                                    raise ValueError(f"ID_MIEMBRO faltante en fila {i}")
                                 
-                                # Actualizar información adicional
-                                info = session.query(InformacionMiembro).filter_by(ID_MIEMBRO=int(row['ID_MIEMBRO'])).first()
-                                if info:
-                                    if row['NUM_TELEFONO']: info.NUM_TELEFONO = row['NUM_TELEFONO']
-                                    if row['REPRESENTANTE']: info.REPRESENTANTE = row['REPRESENTANTE']
-                                    if row['CI_REPRESENTANTE']: info.CI_REPRESENTANTE = row['CI_REPRESENTANTE']
-                                    if row['CORREO']: info.CORREO = row['CORREO']
-                                    if row['DIRECCION']: info.DIRECCION = row['DIRECCION']
-                                    if row['HACIENDA']: info.HACIENDA = row['HACIENDA']
-                            
-                            try:
-                                session.commit()
-                            except Exception as e:
-                                session.rollback()
-                                raise Exception(f"Error actualizando lote {i//batch_size + 1}: {str(e)}")
+                                try:
+                                    id_miembro = int(row['ID_MIEMBRO'])
+                                    actualizaciones_realizadas = False
+                                    
+                                    # Verificar si hay campos para actualizar en Miembro
+                                    campos_miembro = ['RAZON_SOCIAL', 'RIF', 'ULTIMO_MES', 'SALDO']
+                                    tiene_campos_miembro = any(row.get(campo) is not None for campo in campos_miembro if campo in row)
+                                    
+                                    # Actualizar tabla Miembro solo si hay campos relevantes
+                                    if tiene_campos_miembro:
+                                        miembro = session.query(Miembro).get(id_miembro)
+                                        if miembro:
+                                            if 'RAZON_SOCIAL' in row and row['RAZON_SOCIAL'] is not None:
+                                                miembro.RAZON_SOCIAL = row['RAZON_SOCIAL']
+                                            if 'RIF' in row and row['RIF'] is not None:
+                                                miembro.RIF = row['RIF']
+                                            if 'ULTIMO_MES' in row and row['ULTIMO_MES'] is not None:
+                                                miembro.ULTIMO_MES = row['ULTIMO_MES']
+                                            if 'SALDO' in row and row['SALDO'] is not None:
+                                                miembro.SALDO = float(row['SALDO'])
+                                            actualizaciones_realizadas = True
+                                    
+                                    # Verificar si hay campos para actualizar en InformacionMiembro
+                                    campos_info = ['NUM_TELEFONO', 'REPRESENTANTE', 'CI_REPRESENTANTE', 'CORREO', 'DIRECCION', 'HACIENDA']
+                                    tiene_campos_info = any(row.get(campo) is not None for campo in campos_info if campo in row)
+                                    
+                                    # Actualizar tabla InformacionMiembro solo si hay campos relevantes
+                                    if tiene_campos_info:
+                                        info = session.query(InformacionMiembro).filter_by(ID_MIEMBRO=id_miembro).first()
+                                        if info:
+                                            if 'NUM_TELEFONO' in row and row['NUM_TELEFONO'] is not None:
+                                                info.NUM_TELEFONO = row['NUM_TELEFONO']
+                                            if 'REPRESENTANTE' in row and row['REPRESENTANTE'] is not None:
+                                                info.REPRESENTANTE = row['REPRESENTANTE']
+                                            if 'CI_REPRESENTANTE' in row and row['CI_REPRESENTANTE'] is not None:
+                                                info.CI_REPRESENTANTE = row['CI_REPRESENTANTE']
+                                            if 'CORREO' in row and row['CORREO'] is not None:
+                                                info.CORREO = row['CORREO']
+                                            if 'DIRECCION' in row and row['DIRECCION'] is not None:
+                                                info.DIRECCION = row['DIRECCION']
+                                            if 'HACIENDA' in row and row['HACIENDA'] is not None:
+                                                info.HACIENDA = row['HACIENDA']
+                                            actualizaciones_realizadas = True
+                                    
+                                    # Solo hacer commit si hubo actualizaciones reales
+                                    if actualizaciones_realizadas:
+                                        session.commit()
+                                    
+                                except Exception as e:
+                                    session.rollback()
+                                    st.warning(f"Advertencia: No se pudo actualizar ID {row.get('ID_MIEMBRO')}. Error: {str(e)}")
+                                    continue  # Continuar con el siguiente registro
                             
                             progress = (len(nuevos) + i + len(batch)) / total_ops
                             progress_bar.progress(progress)
