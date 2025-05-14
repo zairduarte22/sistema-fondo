@@ -46,7 +46,7 @@ def generar_informe_pdf_miembros(miembros_completo, grupos: list):
         for _, row in miembros.iterrows()
     ]
 
-    table = Table(data, emptyTableAction='indicate')  # Ajustar el ancho de las columnas
+    table = Table(data, emptyTableAction='indicate', colWidths=[30,286,180,76])  # Ajustar el ancho de las columnas
     table.setStyle(TableStyle([
         ("BACKGROUND", (0, 0), (-1, 0), colors.darkgreen),  # Fondo verde oscuro para encabezados
         ("TEXTCOLOR", (0, 0), (-1, 0), colors.whitesmoke),  # Texto blanco en encabezados
