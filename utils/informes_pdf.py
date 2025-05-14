@@ -9,8 +9,8 @@ import io
 import pandas as pd
 
 
-def generar_informe_pdf_miembros(miembros_completo, grupo: str):
-    miembros_completo.sort_values(grupo, 'SALDO', ascending=False)
+def generar_informe_pdf_miembros(miembros_completo, grupos: list):
+    miembros_completo.sort_values(by=grupos, ascending=False)
     pdfmetrics.registerFont(TTFont("Lato Bold", "assets/fonts/Lato/Lato-Bold.ttf"))
     pdfmetrics.registerFont(TTFont("Lato Regular", "assets/fonts/Lato/Lato-Regular.ttf"))
     # Crear un buffer para el PDF
