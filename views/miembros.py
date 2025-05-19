@@ -470,7 +470,8 @@ def cobranza(df):
             st.rerun()
 
 # Se obtienen valores de las tablas miembros e informacion_miembros mediante un join
-miembros_completo = obtener_df_join(Miembro, InformacionMiembro)
+miembros_c = obtener_df_join(Miembro, InformacionMiembro)
+miembros_completo = miembros_c.sort_values(by="SALDO", ascending=False)
 miembros_base = obtener_df(Miembro)
 
 
@@ -554,7 +555,7 @@ with botones:
         if len(seleccion) > 0:
             delete = st.button(':material/delete: Eliminar', use_container_width=True, type='primary')
             if delete:
-                st.session_state.ids_a_eliminar = [miembros_base.loc[i, "ID_MIEMBRO"] for i in seleccion]
+                st.session_state.ids_a_eliminar = [miembros.loc[i, "ID_MIEMBRO"] for i in seleccion]
                 confirmar_eliminacion()
     with col3:
         if len(seleccion) == 1:
