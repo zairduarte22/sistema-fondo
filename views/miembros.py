@@ -477,11 +477,19 @@ def cobranza(df):
             
 @st.dialog('Informe de Miembros', width="large")
 def informe_miembros(df):
-    opciones = st.multiselect("Seleccione las columnas a incluir en el informe:", ['ID_MIEMBRO', 'RAZON_SOCIAL', 'REPRESENTANTE', 'ULTIMO_MES', 'SALDO', 'ESTADO'], default=['ID_MIEMBRO', 'RAZON_SOCIAL', 'ESTADO'], accept_new_options= False)
+    opciones = st.multiselect("Seleccione las columnas a incluir en el informe:", ['ID_MIEMBRO', 'RAZON_SOCIAL', 'REPRESENTANTE', 'ULTIMO_MES', 'SALDO', 'ESTADO'], default=['ID_MIEMBRO', 'RAZON_SOCIAL', 'ESTADO'])
     if st.button('Generar Informe'):
         if not opciones:
             st.warning('Por favor, seleccione al menos una columna para el informe.')
             return
+        informe = generar_informe_pdf_miembros(df, ['ESTADO', 'SALDO'], opciones)
+        st.download_button(
+            label="Descargar Informe",
+            data=informe,
+            file_name="informe_miembros.pdf",
+            mime="application/pdf",
+            type='primary'
+        )
 
 # SECCIONES DE LA PAGINA
 header = st.container()
