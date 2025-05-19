@@ -248,16 +248,20 @@ def generar_reporte_con_formato_imagen(facturas_completo, filtro_reporte, descar
             pago_movil.loc[:, 'UGAVI 60% Bs'] = pago_movil['MONTO_BS'] * 0.6
             pago_movil.loc[:, 'Club 20% Bs'] = pago_movil['MONTO_BS'] * 0.2
             pago_movil.loc[:, 'Total Bs (80%)'] = pago_movil['MONTO_BS'] * 0.8
+            total_monto_bs_tabla1 = pago_movil['Monto Original Bs'].sum()
+            total_ugavi_bs_tabla1 = pago_movil['UGAVI 60% Bs'].sum()
+            total_club_bs_tabla1 = pago_movil['Club 20% Bs'].sum()
+            total_total_bs_tabla1 = pago_movil['Total Bs (80%)'].sum()
         else:
             pago_movil = pd.DataFrame(columns=['FECHA', 'FACT_UGAVI', 'Monto Original Bs', 'UGAVI 60% Bs', 'Club 20% Bs', 'Total Bs (80%)'])
+            total_monto_bs_tabla1 = 0
+            total_ugavi_bs_tabla1 = 0
+            total_club_bs_tabla1 = 0
+            total_total_bs_tabla1 = 0
         
         pago_movil.reset_index(drop=True, inplace=True)
         pago_movil.index += 1
 
-        total_monto_bs_tabla1 = pago_movil['Monto Original Bs'].sum()
-        total_ugavi_bs_tabla1 = pago_movil['UGAVI 60% Bs'].sum()
-        total_club_bs_tabla1 = pago_movil['Club 20% Bs'].sum()
-        total_total_bs_tabla1 = pago_movil['Total Bs (80%)'].sum()
 
         # --- Tabla 2: Cuotas Recibidas en Divisas (Zelle / Efectivo Divisas) ---
         otros_metodos = facturas_filtradas[facturas_filtradas['METODO_PAGO'].isin(['Zelle', 'Efectivo Divisas'])].copy()
@@ -269,17 +273,21 @@ def generar_reporte_con_formato_imagen(facturas_completo, filtro_reporte, descar
             otros_metodos.loc[:, '20% $'] = otros_metodos['MONTO_DIVISAS'] * 0.2
             otros_metodos.loc[:, '60% Bs.'] = otros_metodos['MONTO_BS'] * 0.6
             otros_metodos.loc[:, '20% Bs.'] = otros_metodos['MONTO_BS'] * 0.2
+            total_monto_div_tabla2 = otros_metodos['Monto $'].sum()
+            total_ugavi_div_tabla2 = otros_metodos['60% $'].sum()
+            total_ugavi_bs_div_tabla2 = otros_metodos['60% Bs.'].sum()
+            total_club_div_tabla2 = otros_metodos['20% $'].sum()
+            total_club_bs_div_tabla2 = otros_metodos['20% Bs.'].sum()
         else:
             otros_metodos = pd.DataFrame(columns=['FECHA', 'FACT_UGAVI', 'Monto $','60% $', '20% $', '60 Bs.', '20% Bs.'])
+            total_monto_div_tabla2 = 0
+            total_ugavi_div_tabla2 = 0
+            total_ugavi_bs_div_tabla2 = 0
+            total_club_div_tabla2 = 0
+            total_club_bs_div_tabla2 = 0
 
         otros_metodos.reset_index(drop=True, inplace=True)
         otros_metodos.index += 1
-
-        total_monto_div_tabla2 = otros_metodos['Monto $'].sum()
-        total_ugavi_div_tabla2 = otros_metodos['60% $'].sum()
-        total_ugavi_bs_div_tabla2 = otros_metodos['60% Bs.'].sum()
-        total_club_div_tabla2 = otros_metodos['20% $'].sum()
-        total_club_bs_div_tabla2 = otros_metodos['20% Bs.'].sum()
 
         # --- Overall Totals for Header Boxes and Repartimiento Table ---
         grand_total_recibido_bs = total_monto_bs_tabla1
