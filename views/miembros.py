@@ -554,11 +554,12 @@ with botones:
         if len(seleccion) > 0:
             delete = st.button(':material/delete: Eliminar', use_container_width=True, type='primary')
             if delete:
-                st.session_state.ids_a_eliminar = [miembros.loc[i, "ID_MIEMBRO"] for i in seleccion]
+                st.session_state.ids_a_eliminar = [miembros_base.loc[i, "ID_MIEMBRO"] for i in seleccion]
                 confirmar_eliminacion()
     with col3:
         if len(seleccion) == 1:
             more = st.button(':material/post_add: Ver/Editar', use_container_width=True, type='secondary')
             if more:
                 informacion_miembro(seleccion[0], miembros_base)
-                st.text(miembros_base.loc[414])
+                st.text(miembros_base.loc[0])
+                st.text(seleccion[0])
