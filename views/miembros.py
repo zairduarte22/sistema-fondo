@@ -470,8 +470,7 @@ def cobranza(df):
             st.rerun()
 
 # Se obtienen valores de las tablas miembros e informacion_miembros mediante un join
-miembros_c = obtener_df_join(Miembro, InformacionMiembro)
-miembros_completo = miembros_c.sort_values(by="SALDO", ascending=False)
+miembros_completo = obtener_df_join(Miembro, InformacionMiembro)
 miembros_base = obtener_df(Miembro)
 
 
@@ -561,4 +560,5 @@ with botones:
         if len(seleccion) == 1:
             more = st.button(':material/post_add: Ver/Editar', use_container_width=True, type='secondary')
             if more:
-                informacion_miembro(seleccion[0], miembros_completo)
+                id_miembro = miembros.loc[seleccion[0], 'ID_MIEMBRO']
+                informacion_miembro(id_miembro, miembros_completo)
