@@ -560,5 +560,5 @@ with botones:
         if len(seleccion) == 1:
             more = st.button(':material/post_add: Ver/Editar', use_container_width=True, type='secondary')
             if more:
-                st.toast(seleccion[0])
                 informacion_miembro(seleccion[0], miembros_base)
+                st.toast(miembros_base)
