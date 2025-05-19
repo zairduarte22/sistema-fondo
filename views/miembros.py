@@ -473,6 +473,7 @@ def cobranza(df):
 # Se obtienen valores de las tablas miembros e informacion_miembros mediante un join
 miembros_completo = obtener_df_join(Miembro, InformacionMiembro)
 miembros_base = miembros_completo.sort_values(by="SALDO", ascending=False).copy().reset_index()
+print(miembros_base)
 
 
 # SECCIONES DE LA PAGINA
