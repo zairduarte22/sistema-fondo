@@ -562,4 +562,5 @@ with botones:
             more = st.button(':material/post_add: Ver/Editar', use_container_width=True, type='secondary')
             if more:
                 informacion_miembro(seleccion[0], miembros_base)
-                print(miembros_base.reset_index())
+                h = miembros_base.copy().reset_index()
+                print(h)
