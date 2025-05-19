@@ -470,9 +470,8 @@ def cobranza(df):
             st.rerun()
 
 # Se obtienen valores de las tablas miembros e informacion_miembros mediante un join
-miembros_c = obtener_df_join(Miembro, InformacionMiembro)
-miembros_completo = miembros_c.sort_values(by="SALDO", ascending=False).copy()
-miembros_base = obtener_df(Miembro)
+miembros_completo = obtener_df_join(Miembro, InformacionMiembro)
+miembros_base = miembros_completo.sort_values(by="SALDO", ascending=False).copy()
 
 
 # SECCIONES DE LA PAGINA
@@ -522,7 +521,7 @@ with tabla:
         seleccion = []
     elif not miembros_base.empty:
         # Selección de las columnas a mostrar
-        miembros = miembros_base[["ID_MIEMBRO", "RAZON_SOCIAL", "RIF", "ULTIMO_MES", "SALDO", "ESTADO"]].sort_values(by="SALDO", ascending=False)
+        miembros = miembros_base[["ID_MIEMBRO", "RAZON_SOCIAL", "RIF", "ULTIMO_MES", "SALDO", "ESTADO"]]
         # Configuración de las columnas
         conf_col = {
             "ID_MIEMBRO": st.column_config.NumberColumn("Cod."),
@@ -561,4 +560,4 @@ with botones:
         if len(seleccion) == 1:
             more = st.button(':material/post_add: Ver/Editar', use_container_width=True, type='secondary')
             if more:
-                informacion_miembro(seleccion[0], miembros_completo)
+                informacion_miembro(seleccion[0], miembros_base)
