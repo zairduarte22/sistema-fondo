@@ -332,6 +332,7 @@ def eliminar_datos(tabla, id_miembro):
 
 @st.dialog('Información Adicional', width="large")
 def informacion_miembro(num_indice: int, dataframe1: pd.DataFrame, dataframe2: pd.DataFrame):
+    print(dataframe2)
     id_miembro = dataframe2.loc[num_indice, "Cod."]
     info = dataframe1[dataframe1["ID_MIEMBRO"] == id_miembro]
     info = info.iloc
