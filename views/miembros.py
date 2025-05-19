@@ -10,6 +10,11 @@ from utils.informes_pdf import generar_informe_pdf_miembros, model_member_add_cs
 import time
 import datetime
 
+# Se obtienen valores de las tablas miembros e informacion_miembros mediante un join
+miembros_completo = obtener_df_join(Miembro, InformacionMiembro)
+miembros_base = miembros_completo.sort_values(by="SALDO", ascending=False).reset_index(drop=True)
+# Se obtienen los valores de la tabla miembros
+
 tasa = tasa_bs()
 
 if 'edit' not in st.session_state:
@@ -469,11 +474,27 @@ def cobranza(df):
             mensaje = 'Mensajes enviados exitosamente.'
             st.session_state.notificacion = mensaje
             st.rerun()
+            
+@st.dialog('Informe de Miembros', width="large")
+def informe_miembros(df):
+    opciones = st.multiselect('Seleccione las columnas a incluir en el informe:',
+        ['ID_MIEMBRO', 'RAZON_SOCIAL', 'REPRESENTANTE', 'ULTIMO_MES', 'SALDO', 'ESTADO'],
+        default=['ID_MIEMBRO', 'RAZON_SOCIAL', 'ESTADO'], accept_new_options= False
+    )
+    if st.button('Generar Informe'):
+        if not opciones:
+            st.warning('Por favor, seleccione al menos una columna para el informe.')
+            return
 
-# Se obtienen valores de las tablas miembros e informacion_miembros mediante un join
-miembros_completo = obtener_df_join(Miembro, InformacionMiembro)
-miembros_base = miembros_completo.sort_values(by="SALDO", ascending=False).reset_index(drop=True)
-
+        # Generar el informe PDF
+        pdf_buffer = generar_informe_pdf_miembros(df, ["ESTADO", "SALDO"], opciones)
+        
+        # Descargar el informe
+        st.download_button(
+            label="Descargar Informe",
+            data=pdf_buffer,
+            file_name=f"informe_miembros_{datetime.date.today()}.pdf",
+            mime="application/pdf")
 
 # SECCIONES DE LA PAGINA
 header = st.container()
@@ -496,13 +517,9 @@ with header:
         if cobrar:
             cobranza(miembros_completo)
     with col5:
-        pdf_buffer = generar_informe_pdf_miembros(miembros_completo, ["ESTADO", "SALDO"])
-        st.download_button(
-            label=":material/download: Informe",
-            data=pdf_buffer,
-            file_name=f"informe_miembros {datetime.date.today()}.pdf",
-            mime="application/pdf"
-        )
+        if st.button(':material/download: Generar Informe', use_container_width=True, type='secondary'):
+            # Generar el informe PDF
+            informe_miembros(miembros_base)
 
 with datos:
     col11, col12, col13 = st.columns(3)

@@ -7,12 +7,13 @@ from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfbase import pdfmetrics
 import io
 import pandas as pd
+import streamlit as st
 
 pdfmetrics.registerFont(TTFont("Lato Bold", "assets/fonts/Lato/Lato-Bold.ttf"))
 pdfmetrics.registerFont(TTFont("Lato Regular", "assets/fonts/Lato/Lato-Regular.ttf"))
 
 
-def generar_informe_pdf_miembros(miembros_completo, grupos: list):
+def generar_informe_pdf_miembros(miembros_completo, grupos: list, campos: list):
     miembros = miembros_completo.sort_values(by=grupos, ascending=False)
     # Crear un buffer para el PDF
     buffer = io.BytesIO()
@@ -35,19 +36,49 @@ def generar_informe_pdf_miembros(miembros_completo, grupos: list):
     # Título
     elements.append(Paragraph("Reporte de Miembros", title_style))
     elements.append(Spacer(1, 12))
+    
+    encabezados = []
+    contenido = []
+    
+    for campo in campos:
+        contenido.append(str(campo))
+        if campo == "ID_MIEMBRO":
+            encabezados.append("ID")
+        elif campo == "RAZON_SOCIAL":
+            encabezados.append("Razón Social")
+        elif campo == "RIF":
+            encabezados.append("RIF")
+        elif campo == "ULTIMO_MES":
+            encabezados.append("Último Mes")
+        elif campo == "SALDO":
+            encabezados.append("Saldo")
+        elif campo == "NUM_TELEFONO":
+            encabezados.append("Teléfono")
+        elif campo == "REPRESENTANTE":
+            encabezados.append("Representante")
+        elif campo == "CI_REPRESENTANTE":
+            encabezados.append("CI Representante")
+        elif campo == "CORREO":
+            encabezados.append("Correo")
+        elif campo == "DIRECCION":
+            encabezados.append("Dirección")
+        elif campo == "HACIENDA":
+            encabezados.append("Hacienda")
+        elif campo == "ESTADO":
+            encabezados.append("Estado")
+        else:
+            st.toast(f"Campo desconocido: {campo}", "error")
+            return None
 
     # Tabla de datos
-    data = [["ID", "Razón Social", "Representante", "Estado"]] + [
+    data = [encabezados] + [
         [
-            row["ID_MIEMBRO"],
-            row["RAZON_SOCIAL"],
-            row["REPRESENTANTE"],
-            row["ESTADO"]
+            row[x] for x in contenido
         ]
         for _, row in miembros.iterrows()
     ]
 
-    table = Table(data, emptyTableAction='indicate', colWidths=[30,286,180,76])  # Ajustar el ancho de las columnas
+    table = Table(data)  # Ajustar el ancho de las columnas
     table.setStyle(TableStyle([
         ("BACKGROUND", (0, 0), (-1, 0), colors.darkgreen),  # Fondo verde oscuro para encabezados
         ("TEXTCOLOR", (0, 0), (-1, 0), colors.whitesmoke),  # Texto blanco en encabezados
