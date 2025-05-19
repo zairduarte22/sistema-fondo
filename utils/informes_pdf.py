@@ -18,11 +18,19 @@ def generar_informe_pdf_miembros(miembros_completo, grupos: list, campos: list):
     # Crear un buffer para el PDF
     buffer = io.BytesIO()
     # Configurar la página en orientación horizontal (landscape) con márgenes pequeños
-    doc = SimpleDocTemplate(
-        buffer,
-        pagesize=letter,  # Página horizontal
-        rightMargin=20, leftMargin=20, topMargin=20, bottomMargin=20  # Márgenes pequeños
-    )
+    if len(campos) > 4:
+        doc = SimpleDocTemplate(
+            buffer,
+            pagesize=landscape(letter),  # Página horizontal
+            rightMargin=20, leftMargin=20, topMargin=20, bottomMargin=20  # Márgenes pequeños
+        )
+    else:
+        # Si hay menos de 4 campos, usar orientación vertical  
+        doc = SimpleDocTemplate(
+            buffer,
+            pagesize=letter,  # Página horizontal
+            rightMargin=20, leftMargin=20, topMargin=20, bottomMargin=20  # Márgenes pequeños
+        )
 
     # Estilos
     styles = getSampleStyleSheet()
@@ -78,7 +86,7 @@ def generar_informe_pdf_miembros(miembros_completo, grupos: list, campos: list):
         for _, row in miembros.iterrows()
     ]
 
-    table = Table(data)  # Ajustar el ancho de las columnas
+    table = Table(data, colWidths=[10])  # Ajustar el ancho de las columnas
     table.setStyle(TableStyle([
         ("BACKGROUND", (0, 0), (-1, 0), colors.darkgreen),  # Fondo verde oscuro para encabezados
         ("TEXTCOLOR", (0, 0), (-1, 0), colors.whitesmoke),  # Texto blanco en encabezados
