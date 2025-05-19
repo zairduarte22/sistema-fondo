@@ -521,7 +521,7 @@ with tabla:
         seleccion = []
     elif not miembros_base.empty:
         # Selección de las columnas a mostrar
-        miembros = miembros_base[["ID_MIEMBRO", "RAZON_SOCIAL", "RIF", "ULTIMO_MES", "SALDO", "ESTADO"]]
+        miembros = miembros_base[["ID_MIEMBRO", "RAZON_SOCIAL", "RIF", "ULTIMO_MES", "SALDO", "ESTADO"]].sort_values(by="SALDO", ascending=False)
         # Configuración de las columnas
         conf_col = {
             "ID_MIEMBRO": st.column_config.NumberColumn("Cod."),

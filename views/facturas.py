@@ -1,17 +1,10 @@
 import streamlit as st
-from db.conexion import session, FactCuota, Miembro, InformacionMiembro, obtener_df, obtener_df_join
+from db.conexion import session, FactCuota, Miembro, InformacionMiembro, obtener_df, obtener_df_join, Saldo
 from datetime import date, datetime
 from utils.bcv_tasa import tasa_bs
-import io
-from fpdf import FPDF
 import pandas as pd
-from reportlab.lib.pagesizes import letter
-from reportlab.lib import colors
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, Image
-from reportlab.lib.units import inch
 from utils.print_invoice import invoice_model, setup_printing
-from utils.informes_pdf import generar_factura_pdf
+from utils.informes_pdf import generar_factura_pdf, generar_reporte_con_formato_imagen
 
 
 
@@ -74,6 +67,8 @@ def agregar_factura():
         else:
             ultimo_mes = 'N/A'
         text = st.text(f'Ultimo Mes: {ultimo_mes}')
+    
+    descuento = st.checkbox('Descuento por Pronto Pago', value=False, key='descuento_anticipado')
 
     col10, col11, col12 = st.columns([1, 1, 4], gap='small')
     with col10:
@@ -105,13 +100,20 @@ def agregar_factura():
                                     "REFERENCIA": referencia
                 }
             
+            saldo_descuento = {
+                        "ID_MIEMBRO": id_miembro,
+                        "DESCRIPCION": 'Descuento Por Pronto Pago',
+                        "MONTO": monto_divisas * 0.25}
+            
             # Insertar nueva factura
             nueva_factura = FactCuota(**campos_valores_factura)
+            nuevo_descuento = Saldo(**saldo_descuento)
             try:
                 session.add(nueva_factura)
+                if descuento:
+                    session.add(nuevo_descuento)
                 session.commit()
-                mensaje = 'Factura registrada exitosamente'
-                st.session_state.notificacion = mensaje
+                st.session_state.notificacion = 'Factura registrada exitosamente'
                 st.rerun()
             except Exception as e:
                 session.rollback()
@@ -219,10 +221,9 @@ def eliminar_factura():
                     st.session_state.notificacion = mensaje
             st.rerun()
 
-@st.dialog("Generar Reporte de Facturación", width="large")
+@st.dialog("Reporte de Ingresos por Cuotas",width="small")
 def generar_reporte():
-    st.header("Generar Reporte de Facturación")
-    col1, col2 = st.columns([2, 1])
+    col1, col2 = st.columns([2, 1], vertical_alignment='bottom')
     with col1:
         filtro_reporte = st.date_input(
             "Filtrar por fecha:",
@@ -230,135 +231,13 @@ def generar_reporte():
             format="DD/MM/YYYY", key='filtro_reportes_factura'
         )
     with col2:
-        descargar_excel = st.button(":material/download: Descargar en Excel", type="primary")
-        descargar_pdf = st.button(":material/download: Descargar en PDF", type="primary")
-
-    if isinstance(filtro_reporte, tuple) and len(filtro_reporte) == 2:
-        fecha_inicio, fecha_fin = filtro_reporte
-        facturas_filtradas = facturas_completo[
-            (facturas_completo['FECHA'] >= fecha_inicio) & (facturas_completo['FECHA'] <= fecha_fin)
-        ]
-
-        # Tabla 1: Métodos de Pago 'Pago Movil/Transferencia'
-        pago_movil = facturas_filtradas[facturas_filtradas['METODO_PAGO'] == 'Pago Movil/Transferencia']
-        pago_movil['UGAVI 60%'] = pago_movil['MONTO_BS'] * 0.6
-        pago_movil['Club 20%'] = pago_movil['MONTO_BS'] * 0.2
-        pago_movil['Total'] = pago_movil['MONTO_BS'] * 0.8
-        pago_movil.reset_index(drop=True, inplace=True)
-        pago_movil.index += 1  # Índice numérico empezando desde 1
-
-        # Tabla 2: Métodos de Pago 'Zelle' o 'Efectivo Divisas'
-        otros_metodos = facturas_filtradas[facturas_filtradas['METODO_PAGO'].isin(['Zelle', 'Efectivo Divisas'])]
-        otros_metodos['UGAVI 60%'] = otros_metodos['MONTO_BS'] * 0.6
-        otros_metodos['Club 20%'] = otros_metodos['MONTO_BS'] * 0.2
-        otros_metodos['Total'] = otros_metodos['MONTO_BS'] * 0.8
-        otros_metodos.reset_index(drop=True, inplace=True)
-        otros_metodos.index += 1  # Índice numérico empezando desde 1
-
-        # Totales Generales
-        total_recibido_bs = pago_movil['MONTO_BS'].sum()
-        total_recibido_divisas = otros_metodos['MONTO_DIVISAS'].sum()
-        total_ugavi = total_recibido_bs * 0.6
-        total_club = total_recibido_bs * 0.2
-
-        # Descargar en Excel
-        if descargar_excel:
-            with io.BytesIO() as buffer:
-                with pd.ExcelWriter(buffer, engine='xlsxwriter') as writer:
-                    pago_movil.to_excel(writer, sheet_name="Pago Movil", index=False)
-                    otros_metodos.to_excel(writer, sheet_name="Otros Métodos", index=False)
-                buffer.seek(0)
-                st.download_button(
-                    label="Descargar Reporte en Excel",
-                    data=buffer,
-                    file_name=f"Reporte_Facturacion_{fecha_inicio}_a_{fecha_fin}.xlsx",
-                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                )
-
-        # Descargar en PDF
-        if descargar_pdf:
-            pdf_output = io.BytesIO()
-            doc = SimpleDocTemplate(pdf_output, pagesize=letter, rightMargin=20, leftMargin=20, topMargin=20, bottomMargin=20)
-
-            # Estilos
-            styles = getSampleStyleSheet()
-            title_style = styles["Title"]
-            subtitle_style = styles["Heading2"]
-            subtitle_style.alignment = 1  # Centrar el texto del período
-            normal_style = styles["BodyText"]
-
-            # Contenido del PDF
-            elements = []
-
-            # Título
-            elements.append(Paragraph("Reporte de Facturación", title_style))
-            elements.append(Paragraph(f"Periodo: {fecha_inicio} - {fecha_fin}", subtitle_style))
-            elements.append(Spacer(1, 12))
-
-            # Tabla 1: Pago Movil/Transferencia
-            elements.append(Paragraph("Método de Pago: Pago Movil/Transferencia", subtitle_style))
-            data_pago_movil = [["Fecha", "Factura UGAVI", "UGAVI 60%", "Club 20%", "Total"]] + [
-                [row["FECHA"], row["FACT_UGAVI"], f"Bs. {row['UGAVI 60%']:.2f}", f"Bs. {row['Club 20%']:.2f}", f"Bs. {row['Total']:.2f}"]
-                for _, row in pago_movil.iterrows()
-            ]
-            table_pago_movil = Table(data_pago_movil, colWidths=[80, 100, 100, 100, 100])  # Hacer la tabla más ancha
-            table_pago_movil.setStyle(TableStyle([
-                ("ALIGN", (0, 0), (-1, -1), "RIGHT"),  # Justificar hacia la derecha
-                ("BACKGROUND", (0, 0), (-1, 0), colors.darkgreen),  # Fondo verde oscuro para los encabezados
-                ("TEXTCOLOR", (0, 0), (-1, 0), colors.whitesmoke),  # Texto blanco en los encabezados
-                ("GRID", (0, 0), (-1, -1), 1, colors.black),  # Bordes negros
-                ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
-                ("BOTTOMPADDING", (0, 0), (-1, 0), 12),
-            ]))
-            elements.append(table_pago_movil)
-            elements.append(Spacer(1, 12))
-
-            # Tabla 2: Zelle/Efectivo Divisas
-            elements.append(Paragraph("Métodos de Pago: Zelle / Efectivo Divisas", subtitle_style))
-            data_otros_metodos = [["Fecha", "Factura UGAVI", "UGAVI 60%", "Club 20%", "Total"]] + [
-                [row["FECHA"], row["FACT_UGAVI"], f"Bs. {row['UGAVI 60%']:.2f}", f"Bs. {row['Club 20%']:.2f}", f"Bs. {row['Total']:.2f}"]
-                for _, row in otros_metodos.iterrows()
-            ]
-            table_otros_metodos = Table(data_otros_metodos, colWidths=[80, 100, 100, 100, 100])  # Hacer la tabla más ancha
-            table_otros_metodos.setStyle(TableStyle([
-                ("ALIGN", (0, 0), (-1, -1), "RIGHT"),  # Justificar hacia la derecha
-                ("BACKGROUND", (0, 0), (-1, 0), colors.darkgreen),  # Fondo verde oscuro para los encabezados
-                ("TEXTCOLOR", (0, 0), (-1, 0), colors.whitesmoke),  # Texto blanco en los encabezados
-                ("GRID", (0, 0), (-1, -1), 1, colors.black),  # Bordes negros
-                ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
-                ("BOTTOMPADDING", (0, 0), (-1, 0), 12),
-            ]))
-            elements.append(table_otros_metodos)
-            elements.append(Spacer(1, 12))
-
-            # Tabla Final: Totales Generales
-            elements.append(Paragraph("Totales Generales", subtitle_style))
-            data_totales = [
-                ["Porcentajes", "Bolívares", "Divisas"],
-                ["UGAVI 60%", f"Bs. {total_ugavi:.2f}", f"$ {total_recibido_divisas * 0.6:.2f}"],
-                ["Club 20%", f"Bs. {total_club:.2f}", f"$ {total_recibido_divisas * 0.2:.2f}"],
-                ["Fondo 20%", f"Bs. {total_club:.2f}", f"$ {total_recibido_divisas * 0.2:.2f}"]  # Nueva fila para Fondo 20%
-            ]
-            table_totales = Table(data_totales, colWidths=[120, 120, 120])  # Ajustar el ancho de las columnas
-            table_totales.setStyle(TableStyle([
-                ("ALIGN", (0, 0), (-1, -1), "RIGHT"),  # Justificar hacia la derecha
-                ("BACKGROUND", (0, 0), (-1, 0), colors.darkgreen),  # Fondo verde oscuro para los encabezados
-                ("TEXTCOLOR", (0, 0), (-1, 0), colors.whitesmoke),  # Texto blanco en los encabezados
-                ("GRID", (0, 0), (-1, -1), 1, colors.black),  # Bordes negros
-                ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
-                ("BOTTOMPADDING", (0, 0), (-1, 0), 12),
-            ]))
-            elements.append(table_totales)
-
-            # Construir el PDF
-            doc.build(elements)
-            pdf_output.seek(0)
-
-            # Descargar el PDF
+        reporte = generar_reporte_con_formato_imagen(facturas_completo, filtro_reporte, logo_path="assets/images/LOGO.png")
+        # Descargar el PDF
+        if len(filtro_reporte) > 1:
             st.download_button(
-                label="Descargar Reporte en PDF",
-                data=pdf_output,
-                file_name=f"Reporte_Facturacion_{fecha_inicio}_a_{fecha_fin}.pdf",
+                label=":material/download: Descargar",
+                data=reporte,
+                file_name=f"Reporte_Facturacion_{filtro_reporte[0]}_a_{filtro_reporte[1]}.pdf",
                 mime="application/pdf"
             )
     
@@ -382,7 +261,7 @@ with header:
         if add_factura:
             agregar_factura()
     with col3:
-        generar_reporte_btn = st.button(":material/download: Generar Reporte", type="primary")
+        generar_reporte_btn = st.button(":material/download: Reporte", type="primary")
         if generar_reporte_btn:
             generar_reporte()
 
