@@ -483,16 +483,6 @@ def informe_miembros(df):
             st.warning('Por favor, seleccione al menos una columna para el informe.')
             return
 
-        # Generar el informe PDF
-        pdf_buffer = generar_informe_pdf_miembros(df, ["ESTADO", "SALDO"], opciones)
-        
-        # Descargar el informe
-        st.download_button(
-            label="Descargar Informe",
-            data=pdf_buffer,
-            file_name=f"informe_miembros_{datetime.date.today()}.pdf",
-            mime="application/pdf")
-
 # SECCIONES DE LA PAGINA
 header = st.container()
 datos = st.container()
