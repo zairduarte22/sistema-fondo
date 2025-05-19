@@ -562,4 +562,4 @@ with botones:
         if len(seleccion) == 1:
             more = st.button(':material/post_add: Ver/Editar', use_container_width=True, type='secondary')
             if more:
-                informacion_miembro(seleccion[0], miembros_base, miembros_df)
+                informacion_miembro(seleccion[0], miembros_base, miembros)
