@@ -332,7 +332,7 @@ def eliminar_datos(tabla, id_miembro):
 
 @st.dialog('Información Adicional', width="large")
 def informacion_miembro(num_indice: int, dataframe1: pd.DataFrame, dataframe2: pd.DataFrame):
-    id_miembro = dataframe2.loc[num_indice, "ID_MIEMBRO"]
+    id_miembro = dataframe2.loc[num_indice, "Cod."]
     info = dataframe1[dataframe1["ID_MIEMBRO"] == id_miembro]
     info = info.iloc
 
@@ -561,6 +561,4 @@ with botones:
         if len(seleccion) == 1:
             more = st.button(':material/post_add: Ver/Editar', use_container_width=True, type='secondary')
             if more:
-                informacion_miembro(seleccion[0], miembros_base, miembros)
-                st.text(miembros_base.loc[0])
-                st.text(seleccion[0])
+                informacion_miembro(seleccion[0], miembros_base, miembros_df)
