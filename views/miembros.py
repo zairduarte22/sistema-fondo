@@ -473,7 +473,6 @@ def cobranza(df):
 # Se obtienen valores de las tablas miembros e informacion_miembros mediante un join
 miembros_completo = obtener_df_join(Miembro, InformacionMiembro)
 miembros_base = miembros_completo.sort_values(by="SALDO", ascending=False).copy()
-print(miembros_base.reset_index())
 
 
 # SECCIONES DE LA PAGINA
@@ -563,3 +562,4 @@ with botones:
             more = st.button(':material/post_add: Ver/Editar', use_container_width=True, type='secondary')
             if more:
                 informacion_miembro(seleccion[0], miembros_base)
+                print(miembros_base.reset_index())
