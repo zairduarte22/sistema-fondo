@@ -561,4 +561,4 @@ with botones:
             more = st.button(':material/post_add: Ver/Editar', use_container_width=True, type='secondary')
             if more:
                 informacion_miembro(seleccion[0], miembros_base)
-                st.text(miembros_base.loc[seleccion[0]])
+                st.text(miembros_base.loc[414])
