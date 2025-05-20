@@ -50,43 +50,54 @@ def generar_informe_pdf_miembros(miembros_completo, grupos: list, campos: list):
     medidas = []
     
     for campo in campos:
-        contenido.append(str(campo))
         if campo == "ID_MIEMBRO":
             encabezados.append("ID")
             medidas.append(0.50 * inch)
+            contenido.append(str(campo))
         elif campo == "RAZON_SOCIAL":
             encabezados.append("Razón Social")
             medidas.append(4.25 * inch)
+            contenido.append(str(campo))
         elif campo == "RIF":
             encabezados.append("RIF")
-            medidas.append(1.25 * inch)
+            medidas.append(0.2 * inch)
+            contenido.append(str(campo))
         elif campo == "ULTIMO_MES":
             encabezados.append("Último Mes")
             medidas.append(1.25 * inch)
+            contenido.append(str(campo))
         elif campo == "SALDO":
             encabezados.append("Saldo")
             medidas.append(1.25 * inch)
+            contenido.append(str(campo))
         elif campo == "NUM_TELEFONO":
             encabezados.append("Teléfono")
             medidas.append(1.25 * inch)
+            contenido.append(str(campo))
         elif campo == "REPRESENTANTE":
             encabezados.append("Representante")
             medidas.append(1.25 * inch)
+            contenido.append(str(campo))
         elif campo == "CI_REPRESENTANTE":
             encabezados.append("CI Representante")
             medidas.append(1.25 * inch)
+            contenido.append(str(campo))
         elif campo == "CORREO":
             encabezados.append("Correo")
             medidas.append(1.25 * inch)
+            contenido.append(str(campo))
         elif campo == "DIRECCION":
             encabezados.append("Dirección")
             medidas.append(1.25 * inch)
+            contenido.append(str(campo))
         elif campo == "HACIENDA":
             encabezados.append("Hacienda")
             medidas.append(1.25 * inch)
+            contenido.append(str(campo))
         elif campo == "ESTADO":
             encabezados.append("Estado")
             medidas.append(1.25 * inch)
+            contenido.append(str(campo))
         else:
             st.toast(f"Campo desconocido: {campo}", "error")
             return None
@@ -98,8 +109,7 @@ def generar_informe_pdf_miembros(miembros_completo, grupos: list, campos: list):
         ]
         for _, row in miembros.iterrows()
     ]
-    st.toast(medidas)
-
+    
     table = Table(data, colWidths=medidas)  # Ajustar el ancho de las columnas
     table.setStyle(TableStyle([
         ("BACKGROUND", (0, 0), (-1, 0), colors.darkgreen),  # Fondo verde oscuro para encabezados
