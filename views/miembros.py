@@ -534,11 +534,12 @@ with tabla:
         seleccion = []
     elif not miembros_base.empty:
         # Selección de las columnas a mostrar
-        miembros = miembros_base[["ID_MIEMBRO", "RAZON_SOCIAL", "RIF", "ULTIMO_MES", "SALDO", "ESTADO"]].copy()
+        miembros = miembros_base[["ID_MIEMBRO", "RAZON_SOCIAL", "REPRESENTANTE","RIF", "ULTIMO_MES", "SALDO", "ESTADO"]].copy()
         # Configuración de las columnas
         conf_col = {
             "ID_MIEMBRO": st.column_config.NumberColumn("Cod."),
             "RAZON_SOCIAL": st.column_config.TextColumn("Razón Social"),
+            "REPRESENTANTE": st.column_config.TextColumn("Representante"),
             "RIF": st.column_config.TextColumn("Documento"),
             "ULTIMO_MES": st.column_config.TextColumn("Mensualidad"),
             "SALDO": st.column_config.NumberColumn("Saldo", format="$ %.2f"),
