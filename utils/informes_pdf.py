@@ -98,6 +98,7 @@ def generar_informe_pdf_miembros(miembros_completo, grupos: list, campos: list):
         ]
         for _, row in miembros.iterrows()
     ]
+    st.toast(medidas)
 
     table = Table(data, colWidths=medidas)  # Ajustar el ancho de las columnas
     table.setStyle(TableStyle([
