@@ -119,7 +119,7 @@ def eliminar_movimiento():
         if st.button('Confirmar', use_container_width=True):
             for index in st.session_state.selected_movimiento:
                 try:
-                    session.query(Egreso).filter(Egreso.ID_EGRESO == movimientos.loc[index, "ID_EGRESO"]).delete()
+                    session.query(Egreso).filter(Egreso.ID_EGRESO == int(movimientos.loc[index, "ID_EGRESO"])).delete()
                     session.commit()
                 except Exception as e:
                     session.rollback()
