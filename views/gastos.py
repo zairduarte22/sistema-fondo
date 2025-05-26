@@ -117,9 +117,10 @@ def eliminar_movimiento():
     col0, col1, col2, col3 = st.columns([2, 1.3, 1.3, 2], gap='medium')
     with col0:
         if st.button('Confirmar', use_container_width=True):
-            for index in st.session_state.selected_movimiento:
+            ids_egreso = [int(id_egreso) for id_egreso in st.session_state.selected_movimiento]
+            for id in ids_egreso:
                 try:
-                    session.query(Egreso).filter(Egreso.ID_EGRESO == int(movimientos.loc[index, "ID_EGRESO"])).delete()
+                    session.query(Egreso).filter(Egreso.ID_EGRESO == id).delete()
                     session.commit()
                 except Exception as e:
                     session.rollback()
@@ -285,7 +286,7 @@ with botones:
         if len(seleccion) >= 1:
             delete_movimiento = st.button(':material/delete: Eliminar Movimiento', type='primary')
             if delete_movimiento and seleccion:
-                st.session_state.selected_movimiento = seleccion
+                st.session_state.selected_movimiento = [movimientos_filtrado.loc[i, "ID_EGRESO"] for i in seleccion]
                 eliminar_movimiento()
     with col2:
         if len(seleccion) == 1:
