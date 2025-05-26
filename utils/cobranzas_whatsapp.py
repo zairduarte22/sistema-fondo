@@ -1,7 +1,7 @@
 import requests
 
 def enviar_mensaje_api(chat_id, content):
-    url = "http://localhost:3000/client/sendMessage/ABCD"
+    url = "https://whatsapp-api-fondo.onrender.com/client/sendMessage/FONDO-UGAVI"
     payload = {
         "chatId": f"{chat_id}@c.us",
         "contentType": "string",
