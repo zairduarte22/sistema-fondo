@@ -111,13 +111,13 @@ def agregar_movimiento():
 @st.dialog("Eliminar Egreso", width="large")
 def eliminar_movimiento():
     st.warning('¿Estás seguro de que quieres eliminar los siguientes egresos?')
-    for index in st.session_state.selected_movimiento:
-        st.write(f'ID Egreso: {movimientos.loc[index, "ID_EGRESO"]}')
+    ids_egreso = [int(id_egreso) for id_egreso in st.session_state.selected_movimiento]
+    for id in ids_egreso:
+        st.write(f'ID Egreso: {id}')
 
     col0, col1, col2, col3 = st.columns([2, 1.3, 1.3, 2], gap='medium')
     with col0:
         if st.button('Confirmar', use_container_width=True):
-            ids_egreso = [int(id_egreso) for id_egreso in st.session_state.selected_movimiento]
             for id in ids_egreso:
                 try:
                     session.query(Egreso).filter(Egreso.ID_EGRESO == id).delete()
