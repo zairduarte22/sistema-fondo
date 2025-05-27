@@ -103,7 +103,7 @@ def agregar_factura():
             saldo_descuento = {
                         "ID_MIEMBRO": id_miembro,
                         "DESCRIPCION": 'Descuento Por Pronto Pago',
-                        "MONTO": monto_divisas * 0.25}
+                        "MONTO": 5}
             
             # Insertar nueva factura
             nueva_factura = FactCuota(**campos_valores_factura)
