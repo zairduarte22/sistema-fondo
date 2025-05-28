@@ -67,8 +67,12 @@ def agregar_factura():
         else:
             ultimo_mes = 'N/A'
         text = st.text(f'Ultimo Mes: {ultimo_mes}')
-    
-    descuento = st.checkbox('Descuento por Pronto Pago', value=False, key='descuento_anticipado')
+    colx, colz = st.columns(2)
+    with colx:
+        descuento = st.checkbox('Descuento por Pronto Pago', value=False, key='descuento_anticipado')
+    with colz:
+        with st.popover("Cant. Meses"):
+            meses = st.number_input(step = 1, placeholder = "Ingrese la cantidad de meses...")
 
     col10, col11, col12 = st.columns([1, 1, 4], gap='small')
     with col10:
