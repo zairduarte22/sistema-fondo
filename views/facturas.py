@@ -71,7 +71,7 @@ def agregar_factura():
     with colx:
         descuento = st.checkbox('Descuento por Pronto Pago', value=False, key='descuento_anticipado')
     with colz:
-        with st.popover("Cant. Meses", disable = descuento):
+        with st.popover("Cant. Meses", disable = descuento.value):
             meses = st.number_input("Ingrese la cantidad de meses...",step = 1)
 
     col10, col11, col12 = st.columns([1, 1, 4], gap='small')
