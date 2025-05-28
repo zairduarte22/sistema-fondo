@@ -104,16 +104,17 @@ def agregar_factura():
                                     "MENSUALIDADES": mensualidades,
                                     "REFERENCIA": referencia
                 }
+            
+            # Insertar nueva factura
+            nueva_factura = FactCuota(**campos_valores_factura)
 
             if descuento:
                 saldo_descuento = {
                             "ID_MIEMBRO": id_miembro,
                             "DESCRIPCION": 'Descuento Por Pronto Pago',
                             "MONTO": meses * 5}
+                nuevo_descuento = Saldo(**saldo_descuento)
             
-            # Insertar nueva factura
-            nueva_factura = FactCuota(**campos_valores_factura)
-            nuevo_descuento = Saldo(**saldo_descuento)
             try:
                 session.add(nueva_factura)
                 if descuento:
