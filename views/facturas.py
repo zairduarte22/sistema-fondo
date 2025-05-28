@@ -104,11 +104,12 @@ def agregar_factura():
                                     "MENSUALIDADES": mensualidades,
                                     "REFERENCIA": referencia
                 }
-            
-            saldo_descuento = {
-                        "ID_MIEMBRO": id_miembro,
-                        "DESCRIPCION": 'Descuento Por Pronto Pago',
-                        "MONTO": 5}
+
+            if descuento:
+                saldo_descuento = {
+                            "ID_MIEMBRO": id_miembro,
+                            "DESCRIPCION": 'Descuento Por Pronto Pago',
+                            "MONTO": meses * 5}
             
             # Insertar nueva factura
             nueva_factura = FactCuota(**campos_valores_factura)
