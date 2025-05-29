@@ -177,12 +177,10 @@ def cargar_movimientos_csv():
                 # Convertir FECHA al formato correcto
                 try:
                     df["FECHA"] = pd.to_datetime(df["FECHA"], format="%d/%m/%Y").dt.date
-                    df["INGRESO"] = df["INGRESO"].replace('.', ',', regex=True)
-                    df["INGRESO"] = df["INGRESO"].replace(',', '.', regex=True)
-                    df["INGRESO"] = pd.to_numeric(df["INGRESO"], errors='coerce').fillna(0.0)
-                    df["EGRESO"] = df["EGRESO"].replace('.', ',', regex=True)
-                    df["EGRESO"] = df["EGRESO"].replace(',', '.', regex=True)
-                    df["EGRESO"] = pd.to_numeric(df["EGRESO"], errors='coerce').fillna(0.0)
+                    df["INGRESO_format"] = df["INGRESO"].replace('.', '', regex=False).replace(',', '.', regex=False)
+                    df["INGRESO_num"] = pd.to_numeric(df["INGRESO_format"], errors='coerce').fillna(0.0)
+                    df["EGRESO_format"] = df["EGRESO"].replace('.', '', regex=False).replace(',', '.', regex=False)
+                    df["EGRESO_num"] = pd.to_numeric(df["EGRESO_format"], errors='coerce').fillna(0.0)
                 except Exception:
                     st.error("Error al procesar las fechas o los montos. Asegúrate de que el formato de fecha sea DD/MM/YYYY y los montos sean numéricos.")
                     return
@@ -194,8 +192,8 @@ def cargar_movimientos_csv():
                         REFERENCIA=row["REFERENCIA"],
                         BENEFICIARIO=row["BENEFICIARIO"],
                         DESCRIPCION=row["DESCRIPCION"],
-                        INGRESO=row["INGRESO"],
-                        EGRESO=row["EGRESO"]
+                        INGRESO=row["INGRESO_num"],
+                        EGRESO=row["EGRESO_num"]
                     )
                     for _, row in df.iterrows()
                 ]
