@@ -177,9 +177,9 @@ def cargar_movimientos_csv():
                 # Convertir FECHA al formato correcto
                 try:
                     df["FECHA"] = pd.to_datetime(df["FECHA"], format="%d/%m/%Y").dt.date
-                    df["INGRESO"] = df["INGRESO"].replace(',', '.', regex=True)
+                    df["INGRESO"] = df["INGRESO"].replace('.', '', regex=True).replace(',', '.', regex=True)
                     df["INGRESO"] = pd.to_numeric(df["INGRESO"], errors='coerce').fillna(0.0)
-                    df["EGRESO"] = df["EGRESO"].replace(',', '.', regex=True)
+                    df["EGRESO"] = df["EGRESO"].replace.replace('.', '', regex=True).replace(',', '.', regex=True)
                     df["EGRESO"] = pd.to_numeric(df["EGRESO"], errors='coerce').fillna(0.0)
                 except Exception:
                     st.error("Error al procesar las fechas o los montos. Asegúrate de que el formato de fecha sea DD/MM/YYYY y los montos sean numéricos.")
