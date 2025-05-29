@@ -1,6 +1,7 @@
 import streamlit as st
 from db.conexion import session, Miembro, obtener_df, ConciliacionBS
 from datetime import date, datetime
+import pandas as pd
 
 if 'edit' not in st.session_state:
     st.session_state.edit = True
@@ -143,6 +144,57 @@ def eliminar_movimiento():
             st.session_state.notificacion = 'Movimiento(s) eliminado(s) exitosamente'
             st.rerun()
 
+@st.dialog("Carga Masiva de Movimientos", width="large")
+def cargar_movimientos_csv():
+    st.header("Carga Masiva de Movimientos desde CSV")
+    st.markdown(
+        "Descarga el formato, complétalo y súbelo para registrar varios movimientos de una vez."
+    )
+
+    # Botón para descargar el formato CSV
+    formato = pd.DataFrame(columns=[
+        "FECHA", "CUENTA_CONTABLE", "TIPO_OPERACION", "REFERENCIA",
+        "BENEFICIARIO", "DESCRIPCION", "INGRESO", "EGRESO"
+    ])
+    csv_formato = formato.to_csv(index=False).encode("utf-8")
+    st.download_button(
+        label="Descargar Formato CSV",
+        data=csv_formato,
+        file_name="formato_movimientos.csv",
+        mime="text/csv"
+    )
+
+    # Subida de archivo CSV
+    csv_file = st.file_uploader("Selecciona el archivo CSV", type=["csv"], key="csv_movimientos_dialog")
+    if csv_file is not None:
+        try:
+            df = pd.read_csv(csv_file)
+            required_cols = {"FECHA", "CUENTA_CONTABLE", "TIPO_OPERACION", "REFERENCIA", "BENEFICIARIO", "DESCRIPCION", "INGRESO", "EGRESO"}
+            if not required_cols.issubset(df.columns):
+                st.error(f"El CSV debe contener las columnas: {', '.join(required_cols)}")
+            else:
+                df["FECHA"] = pd.to_datetime(df["FECHA"]).dt.date
+                nuevos_movimientos = [
+                    ConciliacionBS(
+                        FECHA=row["FECHA"],
+                        CUENTA_CONTABLE=row["CUENTA_CONTABLE"],
+                        TIPO_OPERACION=row["TIPO_OPERACION"],
+                        REFERENCIA=row["REFERENCIA"],
+                        BENEFICIARIO=row["BENEFICIARIO"],
+                        DESCRIPCION=row["DESCRIPCION"],
+                        INGRESO=row["INGRESO"],
+                        EGRESO=row["EGRESO"]
+                    )
+                    for _, row in df.iterrows()
+                ]
+                session.add_all(nuevos_movimientos)
+                session.commit()
+                st.success(f"Se han cargado {len(nuevos_movimientos)} movimientos desde el CSV.")
+                st.rerun()
+        except Exception as e:
+            session.rollback()
+            st.error(f"Error al cargar el archivo CSV: {e}")
+
 # Secciones de la página
 header = st.container()
 tabla = st.container()
@@ -150,7 +202,7 @@ botones = st.container()
 
 with header:
     st.title('Conciliacion Bancaria: BNC')
-    col1, col0, col2 = st.columns([2, 4, 1], vertical_alignment='center')
+    col1, col0, col2, col3 = st.columns([2, 4, 1, 2], vertical_alignment='center')
     with col1:
         # Filtro de fecha: primer día del mes actual hasta hoy
         filtro = st.date_input(
@@ -162,6 +214,10 @@ with header:
         add_mov = st.button(':material/add: Nuevo', type='primary')
         if add_mov:
             agregar_movimiento()
+    with col3:
+        btn_carga_csv = st.button(':material/upload: Carga Masiva', type='primary')
+        if btn_carga_csv:
+            cargar_movimientos_csv()
 
 with tabla:
     if isinstance(filtro, tuple) and len(filtro) == 2:
