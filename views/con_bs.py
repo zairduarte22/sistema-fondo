@@ -180,6 +180,7 @@ def cargar_movimientos_csv():
                     df["INGRESO_format"] = df["INGRESO"].replace('.', '', regex=False).replace(',', '.', regex=False)
                     df["INGRESO_num"] = pd.to_numeric(df["INGRESO_format"], errors='coerce').fillna(0.0)
                     df["EGRESO_format"] = df["EGRESO"].replace('.', '', regex=False).replace(',', '.', regex=False)
+                    st.toast(df["INGRESO_format"])
                     df["EGRESO_num"] = pd.to_numeric(df["EGRESO_format"], errors='coerce').fillna(0.0)
                 except Exception:
                     st.error("Error al procesar las fechas o los montos. Asegúrate de que el formato de fecha sea DD/MM/YYYY y los montos sean numéricos.")
