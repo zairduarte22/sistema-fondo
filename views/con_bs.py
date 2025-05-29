@@ -148,7 +148,8 @@ def eliminar_movimiento():
 def cargar_movimientos_csv():
     st.header("Carga Masiva de Movimientos desde CSV")
     st.markdown(
-        "Descarga el formato, complétalo y súbelo para registrar varios movimientos de una vez."
+        "Descarga el formato, complétalo y súbelo para registrar varios movimientos de una vez. "
+        "**El campo FECHA debe estar en formato DD/MM/YYYY.**"
     )
 
     # Botón para descargar el formato CSV
@@ -173,7 +174,12 @@ def cargar_movimientos_csv():
             if not required_cols.issubset(df.columns):
                 st.error(f"El CSV debe contener las columnas: {', '.join(required_cols)}")
             else:
-                df["FECHA"] = pd.to_datetime(df["FECHA"]).dt.date
+                # Convertir FECHA al formato correcto
+                try:
+                    df["FECHA"] = pd.to_datetime(df["FECHA"], format="%d/%m/%Y").dt.date
+                except Exception:
+                    st.error("El campo FECHA debe estar en formato DD/MM/YYYY.")
+                    return
                 nuevos_movimientos = [
                     ConciliacionBS(
                         FECHA=row["FECHA"],
