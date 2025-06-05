@@ -1,11 +1,18 @@
 import streamlit as st
 from db.conexion import session, FactCuota, Miembro, InformacionMiembro, obtener_df, obtener_df_join, Saldo
 from datetime import date, datetime
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.platypus import PageBreak, Table, TableStyle, Paragraph, Spacer, Image, SimpleDocTemplate
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.pagesizes import letter
+from reportlab.lib.enums import TA_LEFT, TA_CENTER
+from reportlab.lib.units import cm
+import io
 from utils.bcv_tasa import tasa_bs
 import pandas as pd
 from utils.print_invoice import invoice_model, setup_printing
 from utils.informes_pdf import generar_factura_pdf, generar_reporte_con_formato_imagen
-
+from reportlab.lib import colors
 
 
 if 'edit' not in st.session_state:
@@ -25,6 +32,10 @@ if 'selected_factura' not in st.session_state:
 facturas = obtener_df(FactCuota)
 miembros = obtener_df(Miembro)
 miembros_completo = obtener_df_join(Miembro, InformacionMiembro)
+
+facturas_completo = facturas.merge(miembros[['ID_MIEMBRO', 'RAZON_SOCIAL']], on='ID_MIEMBRO', how='left')
+facturas_completo['ID_MIEMBRO'] = facturas_completo['RAZON_SOCIAL']
+facturas_completo.drop(columns=['RAZON_SOCIAL'], inplace=True)
 
 
 @st.dialog("Agregar Nueva Factura", width="large")
@@ -228,6 +239,277 @@ def eliminar_factura():
                     st.session_state.notificacion = mensaje
             st.rerun()
 
+@st.dialog("Entrega de Dinero", width="large")
+def entrega_dinero_dialog():
+    st.header("Entrega de Dinero")
+
+    # 1. Selección de rango de fechas
+    rango = st.date_input(
+        "Selecciona el rango de fechas:",
+        value=(datetime.now().replace(day=1).date(), datetime.now().date()),
+        format="DD/MM/YYYY",
+        key="entrega_dinero_rango"
+    )
+
+    if not (isinstance(rango, tuple) and len(rango) == 2):
+        st.info("Seleccione un rango de fechas válido.")
+        return
+
+    fecha_inicio, fecha_fin = rango
+    facturas_rango = facturas[
+        (facturas['FECHA'] >= fecha_inicio) & (facturas['FECHA'] <= fecha_fin)
+    ]
+
+    # 2. Totales en Bs y Divisas
+    total_bs = facturas_rango[facturas_rango['METODO_PAGO'] == 'Pago Movil/Transferencia']['MONTO_BS'].sum()
+    total_divisas = facturas_rango[facturas_rango['METODO_PAGO'].isin(['Zelle', 'Efectivo Divisas'])]['MONTO_DIVISAS'].sum()
+
+    st.markdown(f"<div style='text-align: left'><b>Total Bs (Pago Movil/Transferencia):</b> Bs. {total_bs:,.2f}</div>", unsafe_allow_html=True)
+    st.markdown(f"<div style='text-align: left'><b>Total Divisas (Zelle/Efectivo Divisas):</b> $ {total_divisas:,.2f}</div>", unsafe_allow_html=True)
+
+    # 3. Descuentos
+    st.subheader("Descuentos")
+    if "descuentos_entrega" not in st.session_state:
+        st.session_state["descuentos_entrega"] = []
+
+    with st.form("form_descuentos_entrega", clear_on_submit=True):
+        col1, col2, col3, col4 = st.columns([1, 2, 2, 2])
+        with col1:
+            tipo = st.selectbox("Tipo", ["Bs.", "$"], key="desc_tipo")
+        with col2:
+            monto = st.number_input("Monto", min_value=0.0, step=0.01, format="%.2f", key="desc_monto")
+        with col3:
+            descripcion = st.text_input("Descripción", key="desc_descripcion")
+        with col4:
+            aplica = st.selectbox("Aplicar a", ["Comisariato", "Club"], key="desc_aplica")
+        agregar = st.form_submit_button("Agregar Descuento")
+        if agregar and monto > 0:
+            st.session_state["descuentos_entrega"].append({
+                "tipo": tipo,
+                "monto": monto,
+                "descripcion": descripcion,
+                "aplica": aplica
+            })
+
+    descuentos = st.session_state["descuentos_entrega"]
+
+    # Mostrar descuentos con opción de eliminar
+    if descuentos:
+        st.write("**Descuentos agregados:**")
+        df_desc = pd.DataFrame(descuentos)
+        df_desc_display = df_desc.rename(columns={
+            "tipo": "Tipo",
+            "monto": "Monto",
+            "descripcion": "Descripción",
+            "aplica": "Aplicar a"
+        })
+        df_desc_display.index = [f"#{i+1}" for i in range(len(df_desc_display))]
+        st.dataframe(
+            df_desc_display.style.format({"Monto": "{:,.2f}"}).set_properties(**{'text-align': 'left'}),
+            use_container_width=True,
+            hide_index=False
+        )
+
+    # 4. Calcular totales con descuentos para Comisariato (60%) y Club (20%)
+    def calcular_totales(etiqueta, porcentaje):
+        bs = total_bs * porcentaje
+        div = total_divisas * porcentaje
+        desc_bs = sum(d["monto"] for d in descuentos if d["tipo"] == "Bs." and d["aplica"] == etiqueta)
+        desc_div = sum(d["monto"] for d in descuentos if d["tipo"] == "$" and d["aplica"] == etiqueta)
+        return bs, div, desc_bs, desc_div, bs-desc_bs, div-desc_div
+
+    st.subheader("Resumen Comisariato (60%)")
+    bs_60, div_60, desc_bs_60, desc_div_60, bs_final_60, div_final_60 = calcular_totales("Comisariato", 0.6)
+    st.markdown(f"<div style='text-align: left'>Total Bs 60%: Bs. {bs_60:,.2f} - Descuentos: Bs. {desc_bs_60:,.2f} = <b>Bs. {bs_final_60:,.2f}</b></div>", unsafe_allow_html=True)
+    st.markdown(f"<div style='text-align: left'>Total Divisas 60%: $ {div_60:,.2f} - Descuentos: $ {desc_div_60:,.2f} = <b>$ {div_final_60:,.2f}</b></div>", unsafe_allow_html=True)
+
+    st.subheader("Resumen Club (20%)")
+    bs_20, div_20, desc_bs_20, desc_div_20, bs_final_20, div_final_20 = calcular_totales("Club", 0.2)
+    st.markdown(f"<div style='text-align: left'>Total Bs 20%: Bs. {bs_20:,.2f} - Descuentos: Bs. {desc_bs_20:,.2f} = <b>Bs. {bs_final_20:,.2f}</b></div>", unsafe_allow_html=True)
+    st.markdown(f"<div style='text-align: left'>Total Divisas 20%: $ {div_20:,.2f} - Descuentos: $ {desc_div_20:,.2f} = <b>$ {div_final_20:,.2f}</b></div>", unsafe_allow_html=True)
+
+
+    from reportlab.platypus import PageBreak, Table, TableStyle, Paragraph, Spacer, Image
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.lib.pagesizes import letter
+    from reportlab.lib.enums import TA_LEFT, TA_CENTER
+    from reportlab.lib.units import cm, inch
+
+    def generar_planilla_pdf():
+        buffer = io.BytesIO()
+        doc = SimpleDocTemplate(buffer, pagesize=letter)
+        styles = getSampleStyleSheet()
+        # Usar el mismo formato que en el reporte
+        report_main_title_style = styles["h1"]
+        report_main_title_style.alignment = 1  # Centrado
+        report_main_title_style.fontSize = 16
+        report_main_title_style.fontName = 'Lato Bold'
+        report_main_title_style.leading = 5
+
+        period_subtitle_style = styles["h2"]
+        period_subtitle_style.alignment = 1
+        period_subtitle_style.fontSize = 12
+        period_subtitle_style.fontName = 'Lato Regular'
+
+        style_table_header = ParagraphStyle(name="TableHeader", parent=styles["Normal"], fontName="Lato Bold", fontSize=11, alignment=TA_LEFT)
+        style_table_cell = ParagraphStyle(name="TableCell", parent=styles["Normal"], fontName="Lato Regular", fontSize=11, alignment=TA_LEFT)
+        style_subtitle = ParagraphStyle(name="Subtitle", parent=styles["Heading2"], fontName="Lato Bold", fontSize=13, alignment=TA_LEFT)
+
+        # Logo path (ajusta si es necesario)
+        logo_path = "assets/images/LOGO.png"
+
+        # Calcular rango de fact_ugavi
+        fact_ugavi_vals = facturas_rango['FACT_UGAVI'].dropna()
+        if not fact_ugavi_vals.empty:
+            fact_ugavi_min = int(fact_ugavi_vals.min())
+            fact_ugavi_max = int(fact_ugavi_vals.max())
+            rango_fact_ugavi = f"{fact_ugavi_min} - {fact_ugavi_max}"
+        else:
+            rango_fact_ugavi = "Sin facturas UGAVI en el rango"
+
+        # Reducir margen superior
+        doc.topMargin = 10
+        
+        elements = []
+
+        for etiqueta, porcentaje in [("Comisariato", 0.6), ("Club", 0.2)]:
+
+            # Encabezado con logo, título, periodo y rango de facturas (alineado y pegado)
+            report_title_text = "Entrega de Ingresos Por Cuotas de Miembros"
+            period_text = f"Periodo: {fecha_inicio.strftime('%d/%m/%Y')} - {fecha_fin.strftime('%d/%m/%Y')} | Facturas UGAVI: {rango_fact_ugavi}"
+            header_content_right = [
+                Paragraph(report_title_text, report_main_title_style),
+                Paragraph(period_text, period_subtitle_style),
+            ]
+
+            try:
+                logo_img = Image(logo_path, width=0.75*inch, height=0.75*inch)
+                logo_width = 0.85*inch
+                title_width = 6.0*inch  # Ajusta si necesitas más espacio
+                header_table_data = [[logo_img, header_content_right]]
+                header_layout_table = Table(header_table_data, colWidths=[logo_width, title_width])
+                header_layout_table.setStyle(TableStyle([
+                    ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
+                    ('ALIGN', (0,0), (0,0), 'LEFT'),
+                    ('ALIGN', (1,0), (1,-1), 'CENTER'),
+                    ('LEFTPADDING', (0,0), (0,0), 10),
+                    ('RIGHTPADDING', (0,0), (0,0), 1),
+                    ('TOPPADDING', (0,0), (-1,-1), 2),
+                    ('BOTTOMPADDING', (0,0), (-1,-1), 2),
+                ]))
+                elements.append(header_layout_table)
+            except Exception:
+                elements.extend(header_content_right)
+
+            elements.append(Spacer(1, 4))
+
+            # Ingresos en Bolivares
+            style_subtitle.alignment = 0
+            elements.append(Paragraph("Ingresos en Bolívares", style_subtitle))
+            elements.append(Spacer(1, 2))
+            try:
+                bs, div, desc_bs, desc_div, bs_final, div_final = calcular_totales(etiqueta, porcentaje)
+            except Exception:
+                bs, div, desc_bs, desc_div, bs_final, div_final = 0, 0, 0, 0, 0, 0
+
+            # Tabla Bs: concepto, monto
+            data_bs = [
+                [Paragraph("<b>Concepto</b>", style_table_header), Paragraph("<b>Monto</b>", style_table_header)]
+            ]
+            data_bs.append([Paragraph("Recibido por Cuotas de Miembro", style_table_cell), Paragraph(f"Bs. {bs:,.2f}", style_table_cell)])
+            try:
+                for d in descuentos:
+                    if d["tipo"] == "Bs." and d["aplica"] == etiqueta:
+                        data_bs.append([Paragraph(d['descripcion'], style_table_cell), Paragraph(f"- Bs. {d['monto']:,.2f}", style_table_cell)])
+            except Exception:
+                pass
+            # Header verde, solo líneas verticales, centrado
+            table_bs = Table(data_bs, colWidths=[10*cm, 6.5*cm])
+            table_bs.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (-1, 0), colors.darkgreen),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                ('INNERGRID', (0, 0), (-1, -1), 0.5, colors.black),
+                ('BOX', (0, 0), (-1, -1), 0.5, colors.black),
+                ('LINEBEFORE', (1, 0), (1, -1), 0.5, colors.black),
+                ('LINEAFTER', (0, 0), (0, -1), 0.5, colors.black),
+                ('LINEABOVE', (0, 0), (-1, 0), 0.5, colors.darkgreen),
+                ('LINEBELOW', (0, 0), (-1, 0), 0.5, colors.darkgreen),
+                ('TOPPADDING', (0,0), (-1,-1), 2),
+                ('BOTTOMPADDING', (0,0), (-1,-1), 2),
+            ]))
+            elements.append(table_bs)
+            elements.append(Spacer(1, 2))
+            elements.append(Paragraph(f"<b>Total Bs. a Entregar: Bs. {bs_final:,.2f}</b>", style_table_header))
+            elements.append(Spacer(1, 8))
+
+            # Ingresos en Divisas
+            elements.append(Paragraph("Ingresos en Divisas", style_subtitle))
+            elements.append(Spacer(1, 2))
+            data_div = [
+                [Paragraph("<b>Concepto</b>", style_table_header), Paragraph("<b>Monto</b>", style_table_header)]
+            ]
+            data_div.append([Paragraph("Recibido por Cuotas de Miembro", style_table_cell), Paragraph(f"$ {div:,.2f}", style_table_cell)])
+            try:
+                for d in descuentos:
+                    if d["tipo"] == "$" and d["aplica"] == etiqueta:
+                        data_div.append([Paragraph(d['descripcion'], style_table_cell), Paragraph(f"- $ {d['monto']:,.2f}", style_table_cell)])
+            except Exception:
+                pass
+            table_div = Table(data_div, colWidths=[10*cm, 6.5*cm])
+            table_div.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (-1, 0), colors.darkgreen),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                ('INNERGRID', (0, 0), (-1, -1), 0.5, colors.black),
+                ('BOX', (0, 0), (-1, -1), 0.5, colors.black),
+                ('LINEBEFORE', (1, 0), (1, -1), 0.5, colors.black),
+                ('LINEAFTER', (0, 0), (0, -1), 0.5, colors.black),
+                ('LINEABOVE', (0, 0), (-1, 0), 0.5, colors.darkgreen),
+                ('LINEBELOW', (0, 0), (-1, 0), 0.5, colors.darkgreen),
+                ('TOPPADDING', (0,0), (-1,-1), 2),
+                ('BOTTOMPADDING', (0,0), (-1,-1), 2),
+            ]))
+            elements.append(table_div)
+            elements.append(Spacer(1, 2))
+            elements.append(Paragraph(f"<b>Total $ a Entregar: $ {div_final:,.2f}</b>", style_table_header))
+            elements.append(Spacer(1, 10))
+
+            # Firmas lado a lado
+            firmas = [
+                [Paragraph("<b>Entregado por:</b>", style_table_cell), "", Paragraph("<b>Recibido por:</b>", style_table_cell)],
+                ["", "", ""],
+                ["______________________________", "", "______________________________"]
+            ]
+            firmas_table = Table(firmas, colWidths=[7*cm, 2*cm, 7*cm])
+            firmas_table.setStyle(TableStyle([
+                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                ('TOPPADDING', (0,0), (-1,-1), 2),
+                ('BOTTOMPADDING', (0,0), (-1,-1), 2),
+            ]))
+            elements.append(Spacer(2, 10))
+            elements.append(firmas_table)
+
+            if etiqueta == "Comisariato":
+                elements.append(PageBreak())
+
+        doc.build(elements)
+        buffer.seek(0)
+        return buffer
+
+    st.divider()
+    if st.button("Descargar Planilla PDF"):
+        pdf = generar_planilla_pdf()
+        st.download_button(
+            label="Descargar PDF",
+            data=pdf,
+            file_name=f"Planilla_Entrega_Dinero_{fecha_inicio}_a_{fecha_fin}.pdf",
+            mime="application/pdf"
+        )
+
 @st.dialog("Reporte de Ingresos por Cuotas",width="small")
 def generar_reporte():
     col1, col2 = st.columns([2, 1], vertical_alignment='bottom')
@@ -247,11 +529,6 @@ def generar_reporte():
                 file_name=f"Reporte_Facturacion_{filtro_reporte[0]}_a_{filtro_reporte[1]}.pdf",
                 mime="application/pdf"
             )
-    
-
-facturas_completo = facturas.merge(miembros[['ID_MIEMBRO', 'RAZON_SOCIAL']], on='ID_MIEMBRO', how='left')
-facturas_completo['ID_MIEMBRO'] = facturas_completo['RAZON_SOCIAL']
-facturas_completo.drop(columns=['RAZON_SOCIAL'], inplace=True)
 
 # Secciones de la página
 header = st.container()
@@ -259,7 +536,7 @@ tabla = st.container()
 botones = st.container()
 
 with header:
-    col1, col2, col3 = st.columns([4, 1, 1], vertical_alignment='center')
+    col1, col2, col3, col4 = st.columns([4, 1, 1, 1], vertical_alignment='center')
     with col1:
         st.title('Facturación de Miembros')
         st.write('En esta sección se muestran las facturas de los miembros')
@@ -270,7 +547,11 @@ with header:
     with col3:
         generar_reporte_btn = st.button(":material/download: Reporte", type="primary")
         if generar_reporte_btn:
-            generar_reporte()
+            generar_reporte
+    with col4:
+        entrega_dinero_btn = st.button(":material/money: Entrega de Dinero", type="primary")
+        if entrega_dinero_btn:
+            entrega_dinero_dialog()
 
     col7, col8 = st.columns([1,5])
     with col7:
