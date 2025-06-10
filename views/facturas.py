@@ -572,11 +572,11 @@ with tabla:
         # Aplicar el filtro de fecha
         if isinstance(filtro, tuple) and len(filtro) == 2:
             fecha_inicio, fecha_fin = filtro
-            facturas_completo = facturas_completo[
+            facturas_completo_filtrado_por_fecha = facturas_completo[
                 (facturas_completo['FECHA'] >= fecha_inicio) & (facturas_completo['FECHA'] <= fecha_fin)
             ]
 
-        sorted_facturas = facturas_completo.sort_values(by='FECHA', ascending=False)
+        sorted_facturas = facturas_completo_filtrado_por_fecha.sort_values(by='FECHA', ascending=False)
         # Filtrar las columnas a mostrar
         facturas_filtrado = sorted_facturas[[
             "FECHA", "ID_MIEMBRO", "MONTO_BS", "MONTO_DIVISAS", "METODO_PAGO", "MENSUALIDADES","FACT_UGAVI","FACT_FONDO", "ESTADO"
