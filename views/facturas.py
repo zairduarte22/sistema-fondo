@@ -334,23 +334,17 @@ def entrega_dinero_dialog():
     from reportlab.lib.enums import TA_LEFT, TA_CENTER
     from reportlab.lib.units import cm, inch
 
-    try:
-        pdfmetrics.registerFont(TTFont('Lato Regular', 'assets/fonts/Lato/Lato-Regular.ttf'))
-        pdfmetrics.registerFont(TTFont('Lato Bold', 'assets/fonts/Lato/Lato-Bold.ttf'))
-        LATO_REGULAR = 'Lato Regular'
-        LATO_BOLD = 'Lato Bold'
-    except Exception as e:
-        print(f"ADVERTENCIA: No se pudieron registrar las fuentes Lato: {e}")
-        print("Se usarán las fuentes Helvetica como alternativa.")
-        LATO_REGULAR = 'Helvetica'
-        LATO_BOLD = 'Helvetica-Bold'
-
     def generar_planilla_pdf():
         buffer = io.BytesIO()
         doc = SimpleDocTemplate(buffer, pagesize=letter)
         styles = getSampleStyleSheet()
         
         # --- ESTILOS (con fuentes Lato originales) ---
+        pdfmetrics.registerFont(TTFont('Lato Regular', 'assets/fonts/Lato/Lato-Regular.ttf'))
+        pdfmetrics.registerFont(TTFont('Lato Bold', 'assets/fonts/Lato/Lato-Bold.ttf'))
+        LATO_REGULAR = 'Lato Regular'
+        LATO_BOLD = 'Lato Bold'
+        
         report_main_title_style = ParagraphStyle(
             name='MainTitle',
             parent=styles['h1'],
