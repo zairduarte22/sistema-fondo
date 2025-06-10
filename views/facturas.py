@@ -336,8 +336,8 @@ def entrega_dinero_dialog():
     from reportlab.lib.units import cm, inch
 
     try:
-        pdfmetrics.registerFont(TTFont('Lato Regular', 'ruta/a/fuentes/Lato-Regular.ttf'))
-        pdfmetrics.registerFont(TTFont('Lato Bold', 'ruta/a/fuentes/Lato-Bold.ttf'))
+        pdfmetrics.registerFont(TTFont('Lato Regular', 'assets/fonts/Lato/Lato-Regular.ttf'))
+        pdfmetrics.registerFont(TTFont('Lato Bold', 'assets/fonts/Lato/Lato-Bold.ttf'))
         LATO_REGULAR = 'Lato Regular'
         LATO_BOLD = 'Lato Bold'
     except Exception as e:
