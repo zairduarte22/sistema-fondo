@@ -340,8 +340,6 @@ def entrega_dinero_dialog():
         styles = getSampleStyleSheet()
         
         # --- ESTILOS (con fuentes Lato originales) ---
-        pdfmetrics.registerFont(TTFont('Lato Regular', 'assets/fonts/Lato/Lato-Regular.ttf'))
-        pdfmetrics.registerFont(TTFont('Lato Bold', 'assets/fonts/Lato/Lato-Bold.ttf'))
         LATO_REGULAR = 'Lato Regular'
         LATO_BOLD = 'Lato Bold'
         
