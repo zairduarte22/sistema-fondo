@@ -501,14 +501,14 @@ def entrega_dinero_dialog():
         return buffer
 
     st.divider()
-    if st.button("Descargar Planilla PDF"):
-        pdf = generar_planilla_pdf()
-        st.download_button(
+    pdf = generar_planilla_pdf()
+    if st.download_button(
             label="Descargar PDF",
             data=pdf,
             file_name=f"Planilla_Entrega_Dinero_{fecha_inicio}_a_{fecha_fin}.pdf",
             mime="application/pdf"
         )
+    st.rerun()
 
 @st.dialog("Reporte de Ingresos por Cuotas",width="small")
 def generar_reporte():
