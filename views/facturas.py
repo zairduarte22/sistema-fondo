@@ -335,30 +335,84 @@ def entrega_dinero_dialog():
     from reportlab.lib.enums import TA_LEFT, TA_CENTER
     from reportlab.lib.units import cm, inch
 
+    try:
+        pdfmetrics.registerFont(TTFont('Lato Regular', 'ruta/a/fuentes/Lato-Regular.ttf'))
+        pdfmetrics.registerFont(TTFont('Lato Bold', 'ruta/a/fuentes/Lato-Bold.ttf'))
+        LATO_REGULAR = 'Lato Regular'
+        LATO_BOLD = 'Lato Bold'
+    except Exception as e:
+        print(f"ADVERTENCIA: No se pudieron registrar las fuentes Lato: {e}")
+        print("Se usarán las fuentes Helvetica como alternativa.")
+        LATO_REGULAR = 'Helvetica'
+        LATO_BOLD = 'Helvetica-Bold'
+
     def generar_planilla_pdf():
         buffer = io.BytesIO()
         doc = SimpleDocTemplate(buffer, pagesize=letter)
         styles = getSampleStyleSheet()
-        # Usar el mismo formato que en el reporte
-        report_main_title_style = styles["h1"]
-        report_main_title_style.alignment = 1  # Centrado
-        report_main_title_style.fontSize = 16
-        report_main_title_style.fontName = 'Lato Bold'
-        report_main_title_style.leading = 5
-
-        period_subtitle_style = styles["h2"]
-        period_subtitle_style.alignment = 1
-        period_subtitle_style.fontSize = 12
-        period_subtitle_style.fontName = 'Lato Regular'
-
-        style_table_header = ParagraphStyle(name="TableHeader", parent=styles["Normal"], fontName="Lato Bold", fontSize=11, alignment=TA_LEFT)
-        style_table_cell = ParagraphStyle(name="TableCell", parent=styles["Normal"], fontName="Lato Regular", fontSize=11, alignment=TA_LEFT)
-        style_subtitle = ParagraphStyle(name="Subtitle", parent=styles["Heading2"], fontName="Lato Bold", fontSize=13, alignment=TA_LEFT)
-
-        # Logo path (ajusta si es necesario)
+        
+        # --- ESTILOS (con fuentes Lato originales) ---
+        report_main_title_style = ParagraphStyle(
+            name='MainTitle',
+            parent=styles['h1'],
+            fontName=LATO_BOLD,
+            fontSize=16,
+            alignment=TA_CENTER,
+            leading=20
+        )
+    
+        period_subtitle_style = ParagraphStyle(
+            name='PeriodSubtitle',
+            parent=styles['h2'],
+            fontName=LATO_REGULAR,
+            fontSize=12,
+            alignment=TA_CENTER
+        )
+    
+        style_subtitle = ParagraphStyle(
+            name="Subtitle", 
+            parent=styles["Heading2"], 
+            fontName=LATO_BOLD, 
+            fontSize=13, 
+            alignment=TA_LEFT
+        )
+    
+        style_table_cell = ParagraphStyle(
+            name="TableCell", 
+            parent=styles["Normal"], 
+            fontName=LATO_REGULAR, 
+            fontSize=11, 
+            alignment=TA_LEFT
+        )
+        
+        style_table_cell_center = ParagraphStyle(
+            name="TableCellCenter", 
+            parent=style_table_cell, 
+            fontName=LATO_REGULAR,
+            alignment=TA_CENTER
+        )
+    
+        style_table_header_black = ParagraphStyle(
+            name="TableHeaderBlack", 
+            parent=styles["Normal"], 
+            fontName=LATO_BOLD, 
+            fontSize=11, 
+            alignment=TA_LEFT,
+            textColor=colors.black
+        )
+    
+        style_table_header_white = ParagraphStyle(
+            name="TableHeaderWhite",
+            parent=styles["Normal"],
+            fontName=LATO_BOLD,
+            fontSize=11,
+            textColor=colors.whitesmoke,
+            alignment=TA_CENTER
+        )
+    
+        # --- LÓGICA DEL DOCUMENTO ---
         logo_path = "assets/images/LOGO.png"
-
-        # Calcular rango de fact_ugavi
+    
         fact_ugavi_vals = facturas_rango['FACT_UGAVI'].dropna()
         if not fact_ugavi_vals.empty:
             fact_ugavi_min = int(fact_ugavi_vals.min())
@@ -366,120 +420,121 @@ def entrega_dinero_dialog():
             rango_fact_ugavi = f"{fact_ugavi_min} - {fact_ugavi_max}"
         else:
             rango_fact_ugavi = "Sin facturas UGAVI en el rango"
-
-        # Reducir margen superior
+    
         doc.topMargin = 30
-        
         elements = []
-
+    
         for etiqueta, porcentaje in [("Comisariato", 0.6), ("Club", 0.2)]:
-
-            # Encabezado con logo, título, periodo y rango de facturas (alineado y pegado)
             report_title_text = f"Entrega de Ingresos Por Cuotas de Miembros {etiqueta}"
             period_text = f"Periodo: {fecha_inicio.strftime('%d/%m/%Y')} - {fecha_fin.strftime('%d/%m/%Y')} | Facturas UGAVI: {rango_fact_ugavi}"
             header_content_right = [
                 Paragraph(report_title_text, report_main_title_style),
                 Paragraph(period_text, period_subtitle_style),
             ]
-
+    
             try:
                 logo_img = Image(logo_path, width=0.75*inch, height=0.75*inch)
-                logo_width = 0.85*inch
-                title_width = 6.0*inch  # Ajusta si necesitas más espacio
-                header_table_data = [[logo_img, header_content_right]]
-                header_layout_table = Table(header_table_data, colWidths=[logo_width, title_width])
+                header_layout_table = Table(
+                    [[logo_img, header_content_right]],
+                    colWidths=[0.85*inch, 6.0*inch]
+                )
                 header_layout_table.setStyle(TableStyle([
                     ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
                     ('ALIGN', (0,0), (0,0), 'LEFT'),
                     ('ALIGN', (1,0), (1,-1), 'CENTER'),
-                    ('LEFTPADDING', (0,0), (0,0), 10),
-                    ('RIGHTPADDING', (0,0), (0,0), 1),
-                    ('TOPPADDING', (0,0), (-1,-1), 2),
-                    ('BOTTOMPADDING', (0,0), (-1,-1), 2),
+                    ('LEFTPADDING', (0,0), (0,0), 0),
+                    ('RIGHTPADDING', (0,0), (0,0), 0),
                 ]))
                 elements.append(header_layout_table)
             except Exception:
                 elements.extend(header_content_right)
-
-            elements.append(Spacer(1, 4))
-
-            # Ingresos en Bolivares
-            style_subtitle.alignment = 0
+    
+            elements.append(Spacer(1, 12))
+    
             elements.append(Paragraph("Ingresos en Bolívares", style_subtitle))
-            elements.append(Spacer(1, 2))
+            elements.append(Spacer(1, 4))
+            
             try:
                 bs, div, desc_bs, desc_div, bs_final, div_final = calcular_totales(etiqueta, porcentaje)
             except Exception:
                 bs, div, desc_bs, desc_div, bs_final, div_final = 0, 0, 0, 0, 0, 0
-
-            # Tabla Bs: concepto, monto
+    
             data_bs = [
-                [Paragraph("<b>Concepto</b>", style_table_header), Paragraph("<b>Monto</b>", style_table_header)]
+                [Paragraph("Concepto", style_table_header_white), Paragraph("Monto", style_table_header_white)]
             ]
-            data_bs.append([Paragraph("Recibido por Cuotas de Miembro", style_table_cell), Paragraph(f"Bs. {bs:,.2f}", style_table_cell)])
+            data_bs.append([
+                Paragraph("Recibido por Cuotas de Miembro", style_table_cell), 
+                Paragraph(f"Bs. {bs:,.2f}", style_table_cell_center)
+            ])
+            
             try:
                 for d in descuentos:
                     if d["tipo"] == "Bs." and d["aplica"] == etiqueta:
-                        data_bs.append([Paragraph(d['descripcion'], style_table_cell), Paragraph(f"- Bs. {d['monto']:,.2f}", style_table_cell)])
+                        data_bs.append([
+                            Paragraph(d['descripcion'], style_table_cell), 
+                            Paragraph(f"- Bs. {d['monto']:,.2f}", style_table_cell_center)
+                        ])
             except Exception:
                 pass
-            # Header verde, solo líneas verticales, centrado
+                
             table_bs = Table(data_bs, colWidths=[10*cm, 6.5*cm])
             table_bs.setStyle(TableStyle([
-                ('TEXTCOLOR', (0, 0), (-1, 0), colors.blue),
-                ('TEXTCOLOR', (0, 1), (-1, -1), colors.red),
-                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                ('BACKGROUND', (0, 0), (-1, 0), colors.darkgreen),
+                ('ALIGN', (1, 1), (1, -1), 'CENTER'),
                 ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
                 ('INNERGRID', (0, 0), (-1, -1), 0.5, colors.black),
                 ('BOX', (0, 0), (-1, -1), 0.5, colors.black),
-                ('LINEBEFORE', (1, 0), (1, -1), 0.5, colors.black),
-                ('LINEAFTER', (0, 0), (0, -1), 0.5, colors.black),
-                ('LINEABOVE', (0, 0), (-1, 0), 0.5, colors.darkgreen),
-                ('LINEBELOW', (0, 0), (-1, 0), 0.5, colors.darkgreen),
-                ('TOPPADDING', (0,0), (-1,-1), 2),
-                ('BOTTOMPADDING', (0,0), (-1,-1), 2),
+                ('TOPPADDING', (0,0), (-1,-1), 4),
+                ('BOTTOMPADDING', (0,0), (-1,-1), 4),
             ]))
             elements.append(table_bs)
-            elements.append(Spacer(1, 2))
-            elements.append(Paragraph(f"<b>Total Bs. a Entregar: Bs. {bs_final:,.2f}</b>", style_table_header))
-            elements.append(Spacer(1, 8))
-
-            # Ingresos en Divisas
+            elements.append(Spacer(1, 6))
+            elements.append(Paragraph(f"<b>Total Bs. a Entregar: Bs. {bs_final:,.2f}</b>", style_table_header_black))
+            elements.append(Spacer(1, 12))
+    
             elements.append(Paragraph("Ingresos en Divisas", style_subtitle))
-            elements.append(Spacer(1, 2))
+            elements.append(Spacer(1, 4))
+            
             data_div = [
-                [Paragraph("<b>Concepto</b>", style_table_header), Paragraph("<b>Monto</b>", style_table_header)]
+                [Paragraph("Concepto", style_table_header_white), Paragraph("Monto", style_table_header_white)]
             ]
-            data_div.append([Paragraph("Recibido por Cuotas de Miembro", style_table_cell), Paragraph(f"$ {div:,.2f}", style_table_cell)])
+            data_div.append([
+                Paragraph("Recibido por Cuotas de Miembro", style_table_cell), 
+                Paragraph(f"$ {div:,.2f}", style_table_cell_center)
+            ])
+    
             try:
                 for d in descuentos:
                     if d["tipo"] == "$" and d["aplica"] == etiqueta:
-                        data_div.append([Paragraph(d['descripcion'], style_table_cell), Paragraph(f"- $ {d['monto']:,.2f}", style_table_cell)])
+                        data_div.append([
+                            Paragraph(d['descripcion'], style_table_cell), 
+                            Paragraph(f"- $ {d['monto']:,.2f}", style_table_cell_center)
+                        ])
             except Exception:
                 pass
+    
             table_div = Table(data_div, colWidths=[10*cm, 6.5*cm])
             table_div.setStyle(TableStyle([
                 ('BACKGROUND', (0, 0), (-1, 0), colors.darkgreen),
-                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                ('ALIGN', (1, 1), (1, -1), 'CENTER'),
                 ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
                 ('INNERGRID', (0, 0), (-1, -1), 0.5, colors.black),
                 ('BOX', (0, 0), (-1, -1), 0.5, colors.black),
-                ('LINEBEFORE', (1, 0), (1, -1), 0.5, colors.black),
-                ('LINEAFTER', (0, 0), (0, -1), 0.5, colors.black),
-                ('LINEABOVE', (0, 0), (-1, 0), 0.5, colors.darkgreen),
-                ('LINEBELOW', (0, 0), (-1, 0), 0.5, colors.darkgreen),
-                ('TOPPADDING', (0,0), (-1,-1), 2),
-                ('BOTTOMPADDING', (0,0), (-1,-1), 2),
+                ('TOPPADDING', (0,0), (-1,-1), 4),
+                ('BOTTOMPADDING', (0,0), (-1,-1), 4),
             ]))
             elements.append(table_div)
-            elements.append(Spacer(1, 2))
-            elements.append(Paragraph(f"<b>Total $ a Entregar: $ {div_final:,.2f}</b>", style_table_header))
-            elements.append(Spacer(1, 10))
-
-            # Firmas lado a lado
+            elements.append(Spacer(1, 6))
+            elements.append(Paragraph(f"<b>Total $ a Entregar: $ {div_final:,.2f}</b>", style_table_header_black))
+            elements.append(Spacer(1, 24))
+    
+            firmas_text_style = ParagraphStyle(
+                name='FirmaStyle',
+                parent=style_table_cell_center,
+                fontName=LATO_BOLD
+            )
             firmas = [
-                [Paragraph("<b>Entregado por:</b>", style_table_cell), "", Paragraph("<b>Recibido por:</b>", style_table_cell)],
+                [Paragraph("Entregado por:", firmas_text_style), "", Paragraph("Recibido por:", firmas_text_style)],
                 ["", "", ""],
                 ["______________________________", "", "______________________________"]
             ]
@@ -488,14 +543,13 @@ def entrega_dinero_dialog():
                 ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
                 ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
                 ('TOPPADDING', (0,0), (-1,-1), 2),
-                ('BOTTOMPADDING', (0,0), (-1,-1), 2),
+                ('BOTTOMPADDING', (0,2), (-1,2), 12),
             ]))
-            elements.append(Spacer(2, 10))
             elements.append(firmas_table)
-
+    
             if etiqueta == "Comisariato":
                 elements.append(PageBreak())
-
+    
         doc.build(elements)
         buffer.seek(0)
         return buffer
