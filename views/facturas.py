@@ -426,7 +426,6 @@ def entrega_dinero_dialog():
             # Header verde, solo líneas verticales, centrado
             table_bs = Table(data_bs, colWidths=[10*cm, 6.5*cm])
             table_bs.setStyle(TableStyle([
-                ('BACKGROUND', (0, 0), (-1, 0), colors.darkgreen),
                 ('TEXTCOLOR', (0, 0), (-1, 0), colors.blue),
                 ('TEXTCOLOR', (0, 1), (-1, -1), colors.red),
                 ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
