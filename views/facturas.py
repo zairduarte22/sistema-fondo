@@ -3,7 +3,6 @@ from db.conexion import session, FactCuota, Miembro, InformacionMiembro, obtener
 from datetime import date, datetime
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.platypus import PageBreak, Table, TableStyle, Paragraph, Spacer, Image, SimpleDocTemplate
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.enums import TA_LEFT, TA_CENTER
 from reportlab.lib.units import cm
