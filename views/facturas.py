@@ -368,7 +368,7 @@ def entrega_dinero_dialog():
             rango_fact_ugavi = "Sin facturas UGAVI en el rango"
 
         # Reducir margen superior
-        doc.topMargin = 20
+        doc.topMargin = 30
         
         elements = []
 
@@ -427,8 +427,8 @@ def entrega_dinero_dialog():
             table_bs = Table(data_bs, colWidths=[10*cm, 6.5*cm])
             table_bs.setStyle(TableStyle([
                 ('BACKGROUND', (0, 0), (-1, 0), colors.darkgreen),
-                ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
-                ('TEXTCOLOR', (0, 1), (-1, -1), colors.black),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.blue),
+                ('TEXTCOLOR', (0, 1), (-1, -1), colors.red),
                 ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
                 ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
                 ('INNERGRID', (0, 0), (-1, -1), 0.5, colors.black),
