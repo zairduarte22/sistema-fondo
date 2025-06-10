@@ -547,7 +547,7 @@ with header:
     with col3:
         generar_reporte_btn = st.button(":material/download: Reporte", type="primary")
         if generar_reporte_btn:
-            generar_reporte
+            generar_reporte()
     with col4:
         entrega_dinero_btn = st.button(":material/money: Entrega de Dinero", type="primary")
         if entrega_dinero_btn:
