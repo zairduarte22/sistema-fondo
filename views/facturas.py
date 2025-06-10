@@ -368,14 +368,14 @@ def entrega_dinero_dialog():
             rango_fact_ugavi = "Sin facturas UGAVI en el rango"
 
         # Reducir margen superior
-        doc.topMargin = 10
+        doc.topMargin = 20
         
         elements = []
 
         for etiqueta, porcentaje in [("Comisariato", 0.6), ("Club", 0.2)]:
 
             # Encabezado con logo, título, periodo y rango de facturas (alineado y pegado)
-            report_title_text = "Entrega de Ingresos Por Cuotas de Miembros"
+            report_title_text = f"Entrega de Ingresos Por Cuotas de Miembros {etiqueta}"
             period_text = f"Periodo: {fecha_inicio.strftime('%d/%m/%Y')} - {fecha_fin.strftime('%d/%m/%Y')} | Facturas UGAVI: {rango_fact_ugavi}"
             header_content_right = [
                 Paragraph(report_title_text, report_main_title_style),
@@ -428,6 +428,7 @@ def entrega_dinero_dialog():
             table_bs.setStyle(TableStyle([
                 ('BACKGROUND', (0, 0), (-1, 0), colors.darkgreen),
                 ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+                ('TEXTCOLOR', (0, 1), (-1, -1), colors.black),
                 ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
                 ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
                 ('INNERGRID', (0, 0), (-1, -1), 0.5, colors.black),
