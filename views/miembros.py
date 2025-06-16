@@ -15,7 +15,8 @@ miembros_completo = obtener_df_join(Miembro, InformacionMiembro)
 miembros_base = miembros_completo.sort_values(by="SALDO", ascending=False).reset_index(drop=True)
 # Se obtienen los valores de la tabla miembros
 
-tasa = tasa_bs()
+if 'tasa_bs' not in st.session_state:
+    st.session_state['tasa_bs'] = tasa_bs()
 
 if 'edit' not in st.session_state:
     st.session_state.edit = True
@@ -29,6 +30,7 @@ if st.session_state.get('notificacion'):
 if 'ids_a_eliminar' not in st.session_state:
     st.session_state.ids_a_eliminar = []
 
+tasa = st.session_state['tasa_bs']
 
 @st.dialog('Confirmar Eliminación', width="large")
 def confirmar_eliminacion():
