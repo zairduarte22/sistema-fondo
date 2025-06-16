@@ -2,6 +2,9 @@ import streamlit as st
 from utils.bcv_tasa import tasa_bs
 from views.login import login_page
 
+if 'tasa_bs' not in st.session_state:
+    st.session_state['tasa_bs'] = tasa_bs()
+
 # --- PAGE SETUP ---
 st.set_page_config(layout='wide')
 style = 'style/style.css'
@@ -81,6 +84,6 @@ else:
 
     # --- COMPARTIDO EN TODAS LAS PAGINAS ---
     st.logo('assets/images/LOGO.png', size='large')
-    st.sidebar.write(f'**Tasa BCV: Bs. {tasa_bs()}**')
+    st.sidebar.write(f'**Tasa BCV: Bs. {st.session_state['tasa_bs']}**')
     st.sidebar.button("Cerrar Sesión", on_click=log_out)
     pg.run()
