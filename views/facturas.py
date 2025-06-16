@@ -13,6 +13,8 @@ from utils.print_invoice import invoice_model, setup_printing
 from utils.informes_pdf import generar_factura_pdf, generar_reporte_con_formato_imagen
 from reportlab.lib import colors
 
+if 'tasa_bs' not in st.session_state:
+    st.session_state['tasa_bs'] = tasa_bs()
 
 if 'edit' not in st.session_state:
     st.session_state.edit = True
@@ -48,7 +50,7 @@ def agregar_factura():
             st.session_state.active_number = True      
 
     with col14:
-        st.write(f'Tasa: Bs. {tasa_bs()}')   
+        st.write(f'Tasa: Bs. {st.session_state['tasa_bs']}')   
 
     col6, col7 = st.columns([2.5, 1], vertical_alignment='center')
     with col6:
