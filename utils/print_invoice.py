@@ -168,26 +168,26 @@ def invoice_model(date: datetime, name: str, adress: str, id: str, month: str, m
                 
                 .date2 {{
                     position: absolute;
-                    top: 48mm;
+                    top: 49mm;
                     right: 140mm;
                 }}
                 
                 .name2 {{
                     position: absolute;
-                    top: 54mm;
+                    top: 55mm;
                     left: 58mm;
                     font-size: 13.5pt;
                 }}
                 
                 .address2 {{
                     position: absolute;
-                    top: 59mm;
+                    top: 60mm;
                     left: 41mm;
                 }}
                 
                 .id2 {{
                     position: absolute;
-                    top: 65mm;
+                    top: 66mm;
                     left: 160mm;
                     /* Prueba añadiendo !important para la impresión */
                     /* position: absolute !important;
