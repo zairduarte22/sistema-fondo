@@ -62,7 +62,7 @@ def invoice_model(date: datetime, name: str, adress: str, id: str, month: str, m
                     width: 205mm;
                     margin: 0;
                     padding: 0;
-                    padding: 4mm;
+                    padding: 6mm 4mm 4mm;
                     font-family: Arial;
                     font-size: 12.5pt;
                     position: relative;
