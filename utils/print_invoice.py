@@ -62,7 +62,7 @@ def invoice_model(date: datetime, name: str, adress: str, id: str, month: str, m
                     width: 205mm;
                     margin: 0;
                     padding: 0;
-                    padding: 6mm 4mm 4mm;
+                    padding: 4mm;
                     font-family: Arial;
                     font-size: 12.5pt;
                     position: relative;
@@ -70,6 +70,7 @@ def invoice_model(date: datetime, name: str, adress: str, id: str, month: str, m
                 .pagina {{
                     width: 205mm;
                     height: 148mm;
+                    padding-top: 2mm;
                     position: relative;
                     page-break-after: always;
                     overflow: hidden;
