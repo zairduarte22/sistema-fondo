@@ -11,3 +11,4 @@ def tasa_bs():
         return tasa
     except requests.exceptions.RequestException as e:
         print(f"Error al realizar la solicitud: {e}")
+        return 0
