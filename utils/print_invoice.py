@@ -176,7 +176,7 @@ def invoice_model(date: datetime, name: str, adress: str, id: str, month: str, m
                     position: absolute;
                     top: 55mm;
                     left: 58mm;
-                    font-size: 13.5pt;
+                    font-size: 11.5pt;
                 }}
                 
                 .address2 {{
