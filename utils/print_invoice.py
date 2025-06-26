@@ -84,7 +84,7 @@ def invoice_model(date: datetime, name: str, adress: str, id: str, month: str, m
                 }}
                 .name {{
                     position: absolute;
-                    top: 43mm;
+                    top: 45mm;
                     left: 66mm;
                     font-size: 11.5pt;
                 }}
@@ -174,7 +174,7 @@ def invoice_model(date: datetime, name: str, adress: str, id: str, month: str, m
                 
                 .name2 {{
                     position: absolute;
-                    top: 55mm;
+                    top: 57mm;
                     left: 58mm;
                     font-size: 11.5pt;
                 }}
