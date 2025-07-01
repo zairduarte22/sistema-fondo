@@ -6,7 +6,6 @@ if 'tasa_bs' not in st.session_state:
     st.session_state['tasa_bs'] = tasa_bs()
 
 # --- PAGE SETUP ---
-st.set_page_config(layout='wide')
 style = 'style/style.css'
 with open(style) as e:
     st.markdown(f'<style> {e.read()} </style>', unsafe_allow_html=True)
