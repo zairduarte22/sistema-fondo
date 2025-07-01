@@ -62,7 +62,7 @@ def agregar_factura():
         saldo = z(razon_social)
         y = lambda x: x*-1 if x < 0.00 else 0.00
         monto_divisas = st.number_input('Monto ($)', value=y(saldo))
-        x = lambda x: 0.00 if x == 0.00 else x*tasa_bs()
+        x = lambda x: 0.00 if x == 0.00 else x*st.session_state['tasa_bs']
         monto_bs = st.number_input('Monto (Bs.)', format="%.2f", value=x(monto_divisas))
 
     col8, col9 = st.columns([1, 1])
