@@ -56,7 +56,7 @@ def generar_informe_pdf_miembros(miembros_completo, grupos: list, campos: list):
             contenido.append(str(campo))
         elif campo == "RAZON_SOCIAL":
             encabezados.append("Razón Social")
-            medidas.append(4.5 * inch)
+            medidas.append(4.75 * inch)
             contenido.append(str(campo))
         elif campo == "RIF":
             encabezados.append("RIF")
