@@ -656,6 +656,7 @@ with tabla:
             seleccion = facturas_df.selection.rows
         else:
             st.warning("Seleccione un rango de fechas valido.")
+            seleccion = 0
 
         
 
