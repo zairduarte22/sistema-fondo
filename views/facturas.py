@@ -623,7 +623,7 @@ with tabla:
                 (facturas_completo['FECHA'] >= fecha_inicio) & (facturas_completo['FECHA'] <= fecha_fin)
             ]
 
-        sorted_facturas = facturas_completo_filtrado_por_fecha.sort_values(by='FECHA', ascending=False)
+        sorted_facturas = facturas_completo_filtrado_por_fecha.sort_values(by='ID_FACTURA', ascending=False)
         # Filtrar las columnas a mostrar
         facturas_filtrado = sorted_facturas[[
             "FECHA", "ID_MIEMBRO", "MONTO_BS", "MONTO_DIVISAS", "METODO_PAGO", "MENSUALIDADES","FACT_UGAVI","FACT_FONDO", "ESTADO"
