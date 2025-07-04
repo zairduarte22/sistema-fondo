@@ -623,37 +623,41 @@ with tabla:
                 (facturas_completo['FECHA'] >= fecha_inicio) & (facturas_completo['FECHA'] <= fecha_fin)
             ]
 
-        sorted_facturas = facturas_completo_filtrado_por_fecha.sort_values(by='ID_FACTURA', ascending=False)
-        # Filtrar las columnas a mostrar
-        facturas_filtrado = sorted_facturas[[
-            "FECHA", "ID_MIEMBRO", "MONTO_BS", "MONTO_DIVISAS", "METODO_PAGO", "MENSUALIDADES","FACT_UGAVI","FACT_FONDO", "ESTADO"
-        ]]
+            sorted_facturas = facturas_completo_filtrado_por_fecha.sort_values(by='ID_FACTURA', ascending=False)
+            # Filtrar las columnas a mostrar
+            facturas_filtrado = sorted_facturas[[
+                "FECHA", "ID_MIEMBRO", "MONTO_BS", "MONTO_DIVISAS", "METODO_PAGO", "MENSUALIDADES","FACT_UGAVI","FACT_FONDO", "ESTADO"
+            ]]
+    
+            # Configuración de las columnas
+            conf_col = {
+                "FECHA": st.column_config.DateColumn("Fecha", format="DD-MM-YYYY"),
+                "ID_MIEMBRO": st.column_config.TextColumn("Razón Social"),
+                "MONTO_BS": st.column_config.NumberColumn("Monto Bs", format="Bs. %.2f"),
+                "MONTO_DIVISAS": st.column_config.NumberColumn("Monto Divisas", format="$ %.2f"),
+                "METODO_PAGO": st.column_config.TextColumn("Método de Pago"),
+                "MENSUALIDADES": st.column_config.TextColumn("Mensualidades"),
+                "FACT_UGAVI": st.column_config.NumberColumn("Fact. UGAVI", format="%d"),
+                "FACT_FONDO": st.column_config.NumberColumn("Fact. Fondo", format="%d"),
+                "ESTADO": st.column_config.TextColumn("Estado")
+            }
+    
+            # Mostrar el DataFrame filtrado en la tabla
+            facturas_df = st.dataframe(
+                facturas_filtrado,
+                use_container_width=True,
+                hide_index=True,
+                column_config=conf_col,
+                on_select='rerun',
+                selection_mode='multi-row'
+            )
+    
+            # Obtener las filas seleccionadas
+            seleccion = facturas_df.selection.rows
+        else:
+            st.warning("Seleccione un rango de fechas valido.")
 
-        # Configuración de las columnas
-        conf_col = {
-            "FECHA": st.column_config.DateColumn("Fecha", format="DD-MM-YYYY"),
-            "ID_MIEMBRO": st.column_config.TextColumn("Razón Social"),
-            "MONTO_BS": st.column_config.NumberColumn("Monto Bs", format="Bs. %.2f"),
-            "MONTO_DIVISAS": st.column_config.NumberColumn("Monto Divisas", format="$ %.2f"),
-            "METODO_PAGO": st.column_config.TextColumn("Método de Pago"),
-            "MENSUALIDADES": st.column_config.TextColumn("Mensualidades"),
-            "FACT_UGAVI": st.column_config.NumberColumn("Fact. UGAVI", format="%d"),
-            "FACT_FONDO": st.column_config.NumberColumn("Fact. Fondo", format="%d"),
-            "ESTADO": st.column_config.TextColumn("Estado")
-        }
-
-        # Mostrar el DataFrame filtrado en la tabla
-        facturas_df = st.dataframe(
-            facturas_filtrado,
-            use_container_width=True,
-            hide_index=True,
-            column_config=conf_col,
-            on_select='rerun',
-            selection_mode='multi-row'
-        )
-
-        # Obtener las filas seleccionadas
-        seleccion = facturas_df.selection.rows
+        
 
 with botones:
     col1, col2, col3 = st.columns([1, 1, 4])
