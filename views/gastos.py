@@ -117,7 +117,7 @@ def eliminar_movimiento():
     col0, col1, col2, col3 = st.columns([2, 1.3, 1.3, 2], gap='medium')
     with col0:
         if st.button('Confirmar', use_container_width=True):
-            for value in egresos["ID_EGRESO"].values()
+            for value in egresos["ID_EGRESO"].values():
                 try:
                     session.query(Egreso).filter(Egreso.ID_EGRESO == id).delete()
                     session.commit()
