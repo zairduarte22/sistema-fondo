@@ -292,6 +292,6 @@ with botones:
         if len(seleccion) == 1:
             edit_movimiento = st.button(':material/edit: Ver/Editar', type='primary')
             if edit_movimiento and seleccion:
-                st.session_state.selected_movimiento = movimientos.loc[seleccion[0]].to_dict()
+                st.session_state.selected_movimiento = movimientos_filtrado.loc[seleccion[0]].to_dict()
                 editar_movimiento()
 
