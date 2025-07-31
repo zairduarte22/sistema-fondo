@@ -286,7 +286,7 @@ with botones:
         if len(seleccion) >= 1:
             delete_movimiento = st.button(':material/delete: Eliminar Movimiento', type='primary')
             if delete_movimiento and seleccion:
-                st.session_state.selected_movimiento = [movimientos_filtrado.iloc[(seleccion)]].to_dict()
+                st.session_state.selected_movimiento = movimientos_filtrado.iloc[(seleccion)].to_dict()
                 eliminar_movimiento()
     with col2:
         if len(seleccion) == 1:
