@@ -84,5 +84,6 @@ else:
     # --- COMPARTIDO EN TODAS LAS PAGINAS ---
     st.logo('assets/images/LOGO.png', size='large')
     st.sidebar.write(f'**Tasa BCV: Bs. {st.session_state['tasa_bs']}**')
+    st.sidebar.write(f'**Desarrollado por Zair Duarte**')
     st.sidebar.button("Cerrar Sesión", on_click=log_out)
     pg.run()
