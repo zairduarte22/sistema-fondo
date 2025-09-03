@@ -4,7 +4,6 @@ primaryColor = "#036b08"
 
 
 [server]
-port = 8501
 enableCORS = true
 enableXsrfProtection = true
-enableStaticServing = true
+enableStaticServing = false
