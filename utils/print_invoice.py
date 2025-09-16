@@ -169,7 +169,7 @@ def invoice_model(date: datetime, name: str, adress: str, id: str, month: str, m
                 .date2 {{
                     position: absolute;
                     top: 49mm;
-                    right: 158mm;
+                    right: 153mm;
                 }}
                 
                 .name2 {{
